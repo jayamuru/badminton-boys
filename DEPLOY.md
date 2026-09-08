@@ -72,12 +72,39 @@ are all joins and aggregates — awkward in Firestore, one line each in SQL.)
      <a href="{{ .ConfirmationURL }}">open Badminton Boys</a>.</p>
    ```
 
-5. **Authentication → URL Configuration** → set **Site URL** to wherever you'll host it
+   Do the same to the **Confirm signup** template. Supabase picks the template by whether
+   the address already exists, so leaving that one stock means every *returning* player
+   gets a code and every *new* one gets a link — the failure only shows up for the people
+   you're trying to onboard.
+
+5. **Set up your own SMTP before you share the link.** Supabase's built-in email service is
+   for development only and is rate limited to a **couple of messages an hour** for the
+   whole project. It is not a setting you can raise; the ceiling exists because you're
+   borrowing Supabase's sending reputation. With ten players trying to sign in on a
+   Saturday morning, the third one onwards gets *"email rate limit exceeded"* and simply
+   cannot get in.
+
+   **Authentication → Emails → SMTP Settings** → enable custom SMTP. Any provider works;
+   the free tiers that comfortably cover a badminton group:
+
+   | Provider | Free tier | Notes |
+   | --- | --- | --- |
+   | **Resend** | 3,000/month, 100/day | Simplest setup; Supabase documents it directly |
+   | **Brevo** | 300/day | No custom domain required to start |
+   | **SendGrid** | 100/day | Ubiquitous, more setup |
+
+   Then **Authentication → Rate Limits** → raise *"Rate limit for sending emails"* from the
+   default to something like 30 per hour. That field is ignored until custom SMTP is on.
+
+   Sender address: use one at a domain you control (`noreply@badmintonboys.in`) and verify
+   it with the provider, or codes will land in spam.
+
+6. **Authentication → URL Configuration** → set **Site URL** to wherever you'll host it
    (e.g. `https://badminton-boys.vercel.app`), and add it to **Redirect URLs**. This only
    affects the browser build — the Android app never uses a redirect. While you're
    developing locally, `http://localhost:5173` is the right value.
 
-6. **Project Settings → API Keys** → copy the **Project URL** and the **publishable**
+7. **Project Settings → API Keys** → copy the **Project URL** and the **publishable**
    (anon) key into a `.env.local` file (copy `.env.example` as a starting point):
 
    ```
@@ -91,7 +118,7 @@ are all joins and aggregates — awkward in Firestore, one line each in SQL.)
    bypasses every policy in the schema. If one ever leaks, revoke it under
    **API Keys → Secret keys**.
 
-7. `npm run dev`. You should now get a sign-in screen instead of the demo season.
+8. `npm run dev`. You should now get a sign-in screen instead of the demo season.
 
 ### What the server enforces
 

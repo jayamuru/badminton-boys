@@ -13,12 +13,41 @@ import { Logo } from '../components/Logo'
  * code is typed into whichever copy of the app asked for it, so it works
  * everywhere without deep-link plumbing.
  */
+/**
+ * Near-misses of the big providers, which silently swallow a sign-in.
+ *
+ * A mistyped domain isn't an error anywhere: the address is well-formed, so
+ * Supabase accepts it and reports success, and the app cheerfully asks for a
+ * code that was posted into the void. Worth catching, because the failure is
+ * indistinguishable from every other reason an email doesn't arrive.
+ */
+const DOMAIN_TYPOS: Record<string, string> = {
+  'gmai.com': 'gmail.com',
+  'gmial.com': 'gmail.com',
+  'gmail.co': 'gmail.com',
+  'gnail.com': 'gmail.com',
+  'gmail.con': 'gmail.com',
+  'hotmial.com': 'hotmail.com',
+  'yaho.com': 'yahoo.com',
+  'outlok.com': 'outlook.com',
+}
+
+/** The address they probably meant, or null if this one looks fine. */
+function suggestAddress(input: string): string | null {
+  const [name, domain] = input.trim().toLowerCase().split('@')
+  if (!name || !domain) return null
+  const fixed = DOMAIN_TYPOS[domain]
+  return fixed ? `${name}@${fixed}` : null
+}
+
 export function SignIn() {
   const [email, setEmail] = useState('')
   const [code, setCode] = useState('')
   const [sent, setSent] = useState(false)
   const [busy, setBusy] = useState(false)
+  const [note, setNote] = useState<string | null>(null)
   const [err, setErr] = useState<string | null>(authRedirectError)
+  const suggestion = suggestAddress(email)
 
   const sendCode = async () => {
     const address = email.trim()
@@ -39,10 +68,27 @@ export function SignIn() {
       if (error) throw error
       setSent(true)
     } catch (e) {
-      setErr(e instanceof Error ? e.message : 'Could not send the code')
+      // Supabase's built-in email sender is capped at a couple of messages an
+      // hour for the *whole project*, so this fires on the third person trying
+      // to sign in rather than on anything the person in front of it did. The
+      // real fix is custom SMTP (DEPLOY.md §1.5); until then, say what's
+      // happening instead of showing them a server string about rate limits.
+      setErr(
+        e instanceof Error && /rate limit/i.test(e.message)
+          ? "Too many sign-in emails have gone out from this app in the last hour, so the server won't send another one yet. Wait a few minutes and try again."
+          : e instanceof Error
+            ? e.message
+            : 'Could not send the code',
+      )
     } finally {
       setBusy(false)
     }
+  }
+
+  const resend = async () => {
+    setNote(null)
+    await sendCode()
+    setNote('Sent again. Check your spam folder too — and use the newest code, older ones stop working.')
   }
 
   const verify = async () => {
@@ -99,9 +145,9 @@ export function SignIn() {
           We sent a six digit code to <strong>{email.trim()}</strong>. Type it in below.
         </p>
         <p className="micro dim mt-8">
-          Only a link in that email and no code? The Supabase <em>Magic Link</em> template
-          is missing <code>{'{{ .Token }}'}</code> — see DEPLOY.md §1. Don't tap the link:
-          it's one-time, and mail scanners usually spend it before you can.
+          It can take a minute, and it sometimes lands in spam. If the email has a link in
+          it, ignore the link and type the code — links get opened by spam filters before
+          they reach you, which uses them up.
         </p>
 
         <label className="field mt-24">
@@ -120,6 +166,7 @@ export function SignIn() {
         </label>
 
         {err && <p className="small mt-8" style={{ color: 'var(--loss)' }}>{err}</p>}
+        {!err && note && <p className="small dim mt-8">{note}</p>}
 
         <button
           className="btn btn--primary btn--lg btn--block mt-16"
@@ -129,13 +176,18 @@ export function SignIn() {
           {busy ? 'Checking…' : 'Sign in'}
         </button>
 
+        <button className="btn btn--block mt-8" disabled={busy} onClick={() => void resend()}>
+          {busy ? 'Sending…' : 'Send a new code'}
+        </button>
+
         <button
-          className="btn btn--block mt-8"
+          className="btn btn--ghost btn--block mt-8"
           disabled={busy}
           onClick={() => {
             setSent(false)
             setCode('')
             setErr(null)
+            setNote(null)
           }}
         >
           Use a different email
@@ -167,6 +219,16 @@ export function SignIn() {
             onKeyDown={(e) => e.key === 'Enter' && void sendCode()}
           />
         </label>
+
+        {suggestion && (
+          <p className="small">
+            Did you mean{' '}
+            <button className="link" onClick={() => setEmail(suggestion)}>
+              {suggestion}
+            </button>
+            ? Nothing will arrive if the address is wrong.
+          </p>
+        )}
 
         {err && <p className="small" style={{ color: 'var(--loss)' }}>{err}</p>}
 

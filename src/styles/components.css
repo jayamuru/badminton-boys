@@ -187,6 +187,17 @@
   width: 100%;
 }
 
+/* A button that reads as inline text — used mid-sentence, not as a control. */
+.link {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--neon);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .btn--lg {
   height: 54px;
   font-size: 16px;
