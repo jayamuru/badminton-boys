@@ -92,12 +92,69 @@ are all joins and aggregates — awkward in Firestore, one line each in SQL.)
    | **Resend** | 3,000/month, 100/day | Simplest setup; Supabase documents it directly |
    | **Brevo** | 300/day | No custom domain required to start |
    | **SendGrid** | 100/day | Ubiquitous, more setup |
+   | **Amazon SES** | $0.10 per 1,000 | Cheapest at scale, most setup — see below |
 
    Then **Authentication → Rate Limits** → raise *"Rate limit for sending emails"* from the
    default to something like 30 per hour. That field is ignored until custom SMTP is on.
 
    Sender address: use one at a domain you control (`noreply@badmintonboys.in`) and verify
    it with the provider, or codes will land in spam.
+
+### Using Amazon SES
+
+Note the service name: **SES**, not SNS. SNS delivers to subscribers who have confirmed a
+subscription, so it structurally cannot email a sign-in code to a new player — it's the
+wrong tool, not a harder one.
+
+Pick the region closest to your players and use the **same one throughout**; an identity
+verified in `ap-south-1` does not exist in `us-east-1`, and the mismatch surfaces as an
+opaque auth failure rather than "wrong region".
+
+1. **Verify the sending domain.** SES console → **Identities → Create identity → Domain** →
+   `badmintonboys.in`, leave **Easy DKIM** on. SES gives you three `CNAME` records; add them
+   at your DNS host. Status goes to *Verified* in anywhere from minutes to a few hours.
+
+   Verifying a single address instead is quicker, but then codes arrive from a Gmail address
+   with no DKIM alignment and spam filters treat them accordingly. Domain is worth the wait.
+
+2. **Leave the sandbox.** Every new SES account is sandboxed: **200 emails per 24 hours**,
+   one per second, and — the part that matters — *only to addresses you have separately
+   verified*. Your players' addresses aren't verified, so in the sandbox sign-in works for
+   you and silently fails for everyone else.
+
+   SES console → **Account dashboard → Request production access**. Say it's transactional
+   email — one-time sign-in codes to members of a badminton club, no marketing, recipients
+   are people who typed their own address into the app. Approval is usually within 24 hours.
+   Do this first; it's the long pole.
+
+3. **Create SMTP credentials.** SES console → **SMTP settings → Create SMTP credentials**.
+   That creates an IAM user with `ses:SendRawEmail` and shows a username and password
+   **once** — download the CSV.
+
+   These are *not* your AWS access key and secret. The SMTP password is derived from the
+   secret key by a signing algorithm, so pasting the IAM secret directly will fail to
+   authenticate. If you lose the password, generate new credentials; it can't be re-shown.
+
+4. **Point Supabase at it.** **Authentication → Emails → SMTP Settings**:
+
+   | Field | Value |
+   | --- | --- |
+   | Sender email | `noreply@badmintonboys.in` (must be under the verified domain) |
+   | Sender name | `Badminton Boys` |
+   | Host | `email-smtp.ap-south-1.amazonaws.com` (your region) |
+   | Port | `587` |
+   | Username | SMTP username from the CSV |
+   | Password | SMTP password from the CSV |
+
+5. **Raise the auth rate limit** as above, then send yourself a code to confirm it arrives
+   from your own domain rather than Supabase's sender.
+
+**Where SNS does belong.** SES suspends accounts whose bounce rate passes ~5% or complaint
+rate ~0.1%, and a mistyped address at sign-up is a hard bounce. Under **Identities → your
+domain → Notifications**, publish Bounce and Complaint feedback to an SNS topic and
+subscribe your own email to it, so you find out from a notification rather than from SES
+pausing your sending. The app also catches common domain typos before sending, which keeps
+the bounce rate down at the source.
 
 6. **Authentication → URL Configuration** → set **Site URL** to wherever you'll host it
    (e.g. `https://badminton-boys.vercel.app`), and add it to **Redirect URLs**. This only
