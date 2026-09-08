@@ -9,7 +9,20 @@ import { computeState } from '../engine/scoring'
 window.scrollTo = () => {}
 
 const seed = buildSeed()
-const live = seed.matches.find((m) => m.status === 'live')!
+
+/**
+ * A live match with room left in the current game.
+ *
+ * Not just the first live one: if the seed happens to leave that match on game
+ * point, the tap below finishes the game and `current` rolls over to the next
+ * one at 0–0, so asserting `a + 1` fails for a reason that has nothing to do
+ * with the behaviour under test.
+ */
+const live = seed.matches.find((m) => {
+  if (m.status !== 'live') return false
+  const { a, b } = computeState(m).current
+  return a < 19 && b < 19
+})!
 const before = computeState(live).current
 
 function boot() {

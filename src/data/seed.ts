@@ -22,6 +22,25 @@ function rng(seed: number) {
   }
 }
 
+/**
+ * Fisher–Yates, drawing from `rand`.
+ *
+ * Deliberately not `sort(() => rand() - 0.5)`. That idiom is biased, but the
+ * bigger problem here is that the spec leaves the *number* of comparator calls
+ * up to the engine — so a different V8 version consumes a different number of
+ * values from the generator and every subsequent draw diverges. The whole seed
+ * downstream of the first shuffle would then differ between your laptop and CI,
+ * which is exactly the kind of bug that only ever reproduces somewhere else.
+ */
+function shuffled<T>(items: readonly T[], rand: () => number): T[] {
+  const out = [...items]
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1))
+    ;[out[i], out[j]] = [out[j], out[i]]
+  }
+  return out
+}
+
 const TINTS = [
   '#C8FF2E',
   '#5AC8FA',
@@ -235,17 +254,17 @@ export function buildSeed(now = Date.now()): SeedData {
       const roster = pick(clubRosters)
       if (roster.length < 4) continue
       const at = now - day * DAY + 18 * HOUR + s * 40 * 60_000
-      const shuffled = [...roster].sort(() => rand() - 0.5)
+      const roll = shuffled(roster, rand)
       if (rand() < 0.45) {
-        record([shuffled[0]], [shuffled[1]], 'Singles', at)
+        record([roll[0]], [roll[1]], 'Singles', at)
       } else {
-        record([shuffled[0], shuffled[1]], [shuffled[2], shuffled[3]], 'Doubles', at)
+        record([roll[0], roll[1]], [roll[2], roll[3]], 'Doubles', at)
       }
     }
     // Make sure the demo user plays often enough to have a rich profile.
     if (day % 3 === 0) {
       const at = now - day * DAY + 19 * HOUR
-      const mates = clubs[0].memberIds.filter((id) => id !== ME).sort(() => rand() - 0.5)
+      const mates = shuffled(clubs[0].memberIds.filter((id) => id !== ME), rand)
       if (rand() < 0.55) record([ME, 'p5'], [mates[0], mates[1]], 'Doubles', at, { clubId: 'c0' })
       else record([ME], [mates[0]], 'Singles', at, { clubId: 'c0' })
     }
