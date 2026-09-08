@@ -164,12 +164,40 @@ export function Register() {
     nav('/')
   }
 
+  const newAccount = cloud.enabled && cloud.status === 'needs_profile'
+
   return (
     <div className="onb" style={{ overflowY: 'auto' }}>
       <div>
         <h1 className="onb__title">Set up your player card</h1>
         <p className="onb__body">This is what other players see on the leaderboard.</p>
       </div>
+
+      {newAccount && (
+        <div className="card mt-16">
+          <p className="small">
+            {cloud.identity?.anonymous ? (
+              <>
+                You're browsing as a <strong>guest</strong>. A guest is a brand new account
+                every time, so anything you set up here won't be waiting for you next time.
+              </>
+            ) : (
+              <>
+                You're signed in as <strong>{cloud.identity?.email ?? 'a new account'}</strong>,
+                and that address doesn't have a player card yet.
+              </>
+            )}
+          </p>
+          <p className="small dim mt-8">
+            If you've played here before, you used a different address or the guest button —
+            sign out and come back with the same email as last time rather than making a
+            second card.
+          </p>
+          <button className="btn btn--block mt-12" onClick={() => void cloud.signOut()}>
+            Sign out and try another email
+          </button>
+        </div>
+      )}
 
       <div className="stack-lg mt-24">
         <label className="field">

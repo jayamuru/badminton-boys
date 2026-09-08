@@ -367,6 +367,14 @@ interface Ctx {
     error: string | null
     /** True when this device is watching a shared link without an account. */
     spectator: boolean
+    /**
+     * Which login this device is on — not which player card it owns.
+     *
+     * Worth surfacing, because "sign in again and it asks me to register again"
+     * always means the browser is on a *different* login than last time, and
+     * without showing the address there's no way for anyone to tell.
+     */
+    identity: { email: string | null; anonymous: boolean } | null
     /** Pull the whole world down again. */
     refresh: () => Promise<void>
     signOut: () => Promise<void>
@@ -409,6 +417,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null)
   /** Match id when this device is an account-less spectator on a shared link. */
   const [spectating, setSpectating] = useState<string | null>(null)
+  const [identity, setIdentity] = useState<Ctx['cloud']['identity']>(null)
   const channelRef = useRef<BroadcastChannel | null>(null)
   const echoRef = useRef(false)
   const meIdRef = useRef<string | null>(null)
@@ -464,9 +473,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setError(null)
     setStatus('connecting')
     try {
+      const { data: sess } = await db().auth.getSession()
+      const user = sess.session?.user ?? null
+      setIdentity(
+        user ? { email: user.email ?? null, anonymous: user.is_anonymous === true } : null,
+      )
+
       const profile = await myProfile()
       if (!profile) {
-        const { data } = await db().auth.getSession()
+        const data = sess
 
         // Someone opened a shared "watch this match" link without an account.
         // Give them the match, read only, and don't ask them to sign up.
@@ -584,6 +599,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       status,
       error,
       spectator: Boolean(spectating),
+      identity,
       refresh: async () => {
         if (meIdRef.current) await pull(meIdRef.current)
       },
@@ -591,10 +607,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
         if (!cloudEnabled) return
         await db().auth.signOut()
         meIdRef.current = null
+        setIdentity(null)
         setStatus('signed_out')
       },
     }),
-    [status, error, pull, spectating],
+    [status, error, pull, spectating, identity],
   )
 
   const value = useMemo<Ctx>(() => {

@@ -529,3 +529,59 @@ begin
   begin execute 'alter publication supabase_realtime add table clubs';         exception when duplicate_object then null; end;
   begin execute 'alter publication supabase_realtime add table tournaments';   exception when duplicate_object then null; end;
 end $$;
+
+-- ---------------------------------------------------------------------------
+-- The default community
+--
+-- One deployment is one club, so it gets a hard-coded id rather than a
+-- generated one. Re-running this file must not mint a second copy, and the
+-- trigger below needs something stable to point new players at.
+-- ---------------------------------------------------------------------------
+
+insert into clubs (id, name, area, city, courts)
+values ('b0000000-0000-4000-8000-000000000001', 'Badminton Boys - SRS', 'SRS', 'Bengaluru', 4)
+on conflict (id) do update set name = excluded.name, area = excluded.area, city = excluded.city;
+
+/*
+ * Put every new player in it.
+ *
+ * This has to be server side. The sign-up screen renders before the world has
+ * loaded — you can't read the club list until you have a profile, and you can't
+ * have a profile until you've filled in that screen — so the client genuinely
+ * does not know which community to name, and sends null. Defaulting here means
+ * nobody lands in the app belonging to nothing.
+ */
+create or replace function bb_default_club() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  if new.club_id is null then
+    new.club_id := 'b0000000-0000-4000-8000-000000000001';
+  end if;
+  return new;
+end $$;
+
+drop trigger if exists profiles_default_club on profiles;
+create trigger profiles_default_club before insert on profiles
+  for each row execute function bb_default_club();
+
+-- club_members is what the club screen counts, so keep it in step with the
+-- column rather than leaving the two to drift.
+create or replace function bb_sync_club_membership() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  if new.club_id is not null then
+    insert into club_members (club_id, profile_id) values (new.club_id, new.id)
+    on conflict do nothing;
+  end if;
+  return new;
+end $$;
+
+drop trigger if exists profiles_sync_club on profiles;
+create trigger profiles_sync_club after insert or update of club_id on profiles
+  for each row execute function bb_sync_club_membership();
+
+-- Backfill anyone who signed up before the above existed.
+update profiles set club_id = 'b0000000-0000-4000-8000-000000000001' where club_id is null;
+insert into club_members (club_id, profile_id)
+  select club_id, id from profiles where club_id is not null
+  on conflict do nothing;

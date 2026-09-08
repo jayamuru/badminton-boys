@@ -6,7 +6,7 @@ A dark-mode, mobile-first badminton app: live scoring with a complete BWF rules 
 spectator broadcasts over a QR code, ELO ratings with tiers, leaderboards, head-to-head
 comparisons, clubs and tournaments.
 
-**▶ Live: https://jayamuru.github.io/badminton-boys/**
+**▶ Live: https://badmintonboys.in/**
 
 Deployed from `main` by GitHub Actions on every push — no APK needed. Add it to your home
 screen and it behaves like an installed app.

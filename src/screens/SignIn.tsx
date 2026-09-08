@@ -181,6 +181,10 @@ export function SignIn() {
         <button className="btn btn--block" disabled={busy} onClick={guest}>
           👀 Have a look around as a guest
         </button>
+        <p className="micro center">
+          A guest is a fresh throwaway account every time. Use your email if you want the
+          same player card and rating to be here next time.
+        </p>
       </div>
 
       <p className="micro center mt-16">

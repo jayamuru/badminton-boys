@@ -118,7 +118,7 @@ These are tested — the schema was applied to a real Postgres 16 and exercised 
 
 ### What's actually deployed
 
-**https://jayamuru.github.io/badminton-boys/** — GitHub Pages, built from
+**https://badmintonboys.in/** — GitHub Pages, built from
 `jayamuru/badminton-boys` by `.github/workflows/deploy.yml` on every push to `main`.
 Free with no limits that matter at this scale, HTTPS included.
 
@@ -128,7 +128,7 @@ The three build inputs live on the repo, not in the code:
 | --- | --- | --- |
 | Settings → Secrets and variables → Actions → **Secrets** | `VITE_SUPABASE_URL` | |
 | ″ | `VITE_SUPABASE_ANON_KEY` | public by design, but no reason to put it in git |
-| ″ → **Variables** | `VITE_PUBLIC_URL` | `https://jayamuru.github.io/badminton-boys` |
+| ″ → **Variables** | `VITE_PUBLIC_URL` | `https://badmintonboys.in` |
 
 Set them from a checkout with:
 
@@ -136,7 +136,7 @@ Set them from a checkout with:
 set -a; . ./.env.local; set +a
 gh secret set VITE_SUPABASE_URL      --body "$VITE_SUPABASE_URL"
 gh secret set VITE_SUPABASE_ANON_KEY --body "$VITE_SUPABASE_ANON_KEY"
-gh variable set VITE_PUBLIC_URL      --body "https://jayamuru.github.io/badminton-boys"
+gh variable set VITE_PUBLIC_URL      --body "https://badmintonboys.in"
 gh workflow run "Deploy to GitHub Pages"    # secrets only apply to the next build
 ```
 
@@ -145,13 +145,23 @@ at build time, so it isn't a runtime misconfiguration you can spot from the outs
 site just quietly serves the on-device simulated season to everyone. Check with:
 
 ```bash
-curl -s https://jayamuru.github.io/badminton-boys/ | grep -o 'assets/index-[^"]*\.js' |
-  head -1 | xargs -I{} curl -s https://jayamuru.github.io/badminton-boys/{} |
+curl -s https://badmintonboys.in/ | grep -o 'assets/index-[^"]*\.js' |
+  head -1 | xargs -I{} curl -s https://badmintonboys.in/{} |
   grep -c supabase.co        # 0 = demo mode, 1 = cloud mode
 ```
 
 Because the repo is public, **remember Actions logs are public too.** Never `echo` a
 secret in a workflow step.
+
+### The custom domain
+
+`badmintonboys.in` is set as the Pages custom domain, and `public/CNAME` carries it into
+every build. The file is the belt to the settings' braces: the domain lives in repo
+settings, but keeping it in the published artifact too means a redeploy can't quietly drop
+you back to `jayamuru.github.io`.
+
+If you ever change the domain, change it in three places or share links will point at the
+old one: Pages settings, `public/CNAME`, and the `VITE_PUBLIC_URL` variable.
 
 ### Alternative: Vercel
 
@@ -183,7 +193,7 @@ configuration), or inside the Android WebView with no rewrite rules.
 ### Tell Supabase about the new address
 
 **Authentication → URL Configuration** → set **Site URL** to
-`https://jayamuru.github.io/badminton-boys/` and add it under **Redirect URLs**. This is
+`https://badmintonboys.in/` and add it under **Redirect URLs**. This is
 only used by the emailed link in the browser build; the six digit code and the Android app
 don't need it. Leave `http://localhost:5173` in Redirect URLs so local development keeps
 working.
