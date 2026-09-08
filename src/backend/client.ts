@@ -80,7 +80,7 @@ export const authRedirectError: string | null = (() => {
   // routinely fetch links to scan them, which spends the token.
   const message =
     code === 'otp_expired'
-      ? 'That sign-in link had already been used or had expired. Email links get consumed by spam scanners before you ever tap them, which is why the six digit code is the reliable way in.'
+      ? 'That sign-in link had already been used or had expired. Email links get consumed by spam scanners before you ever tap them, which is why the typed code is the reliable way in.'
       : (description?.replace(/\+/g, ' ') ?? 'That sign-in link did not work.')
 
   window.history.replaceState(null, '', `${origin}${pathname}#/`)

@@ -4,16 +4,6 @@ import { useApp } from '../store/AppStore'
 import { Logo } from '../components/Logo'
 
 /**
- * Cloud mode only. A badminton group shouldn't need a password ceremony, so
- * this is a one-time email code plus a one-tap guest option.
- *
- * The code matters more than it looks. Inside the Android app the page is
- * served from `https://localhost`, and a magic link tapped in Gmail opens the
- * *browser* — which has no way to hand the session back to the app. A six digit
- * code is typed into whichever copy of the app asked for it, so it works
- * everywhere without deep-link plumbing.
- */
-/**
  * Near-misses of the big providers, which silently swallow a sign-in.
  *
  * A mistyped domain isn't an error anywhere: the address is well-formed, so
@@ -32,6 +22,17 @@ const DOMAIN_TYPOS: Record<string, string> = {
   'outlok.com': 'outlook.com',
 }
 
+/**
+ * How long a sign-in code can be.
+ *
+ * Six is the Supabase default, but the length is a project setting that goes up
+ * to ten — and a field capped at six *silently truncates* a longer code, so the
+ * paste looks right, the sign-in fails, and nothing anywhere says why. Accept
+ * the widest the server can issue and let it decide what's valid.
+ */
+const CODE_MAX = 10
+const CODE_MIN = 6
+
 /** The address they probably meant, or null if this one looks fine. */
 function suggestAddress(input: string): string | null {
   const [name, domain] = input.trim().toLowerCase().split('@')
@@ -40,6 +41,16 @@ function suggestAddress(input: string): string | null {
   return fixed ? `${name}@${fixed}` : null
 }
 
+/**
+ * Cloud mode only. A badminton group shouldn't need a password ceremony, so
+ * this is a one-time email code plus a one-tap guest option.
+ *
+ * The code matters more than it looks. Inside the Android app the page is
+ * served from `https://localhost`, and a magic link tapped in Gmail opens the
+ * *browser* — which has no way to hand the session back to the app. A code is
+ * typed into whichever copy of the app asked for it, so it works everywhere
+ * without deep-link plumbing.
+ */
 export function SignIn() {
   const [email, setEmail] = useState('')
   const [code, setCode] = useState('')
@@ -97,7 +108,7 @@ export function SignIn() {
 
   const verify = async () => {
     const token = code.replace(/\D/g, '')
-    if (token.length < 6) return
+    if (token.length < CODE_MIN) return
     setBusy(true)
     setErr(null)
     try {
@@ -146,7 +157,7 @@ export function SignIn() {
         <div className="onb__art">📬</div>
         <h1 className="onb__title">Check your email</h1>
         <p className="onb__body">
-          We sent a six digit code to <strong>{email.trim()}</strong>. Type it in below.
+          We sent a sign-in code to <strong>{email.trim()}</strong>. Type it in below.
         </p>
         <p className="micro dim mt-8">
           It can take a minute, and it sometimes lands in spam. If the email has a link in
@@ -160,10 +171,9 @@ export function SignIn() {
             className="input input--code"
             inputMode="numeric"
             autoComplete="one-time-code"
-            placeholder="000000"
-            maxLength={6}
+            maxLength={CODE_MAX}
             value={code}
-            onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+            onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, CODE_MAX))}
             onKeyDown={(e) => e.key === 'Enter' && void verify()}
             autoFocus
           />
@@ -174,7 +184,7 @@ export function SignIn() {
 
         <button
           className="btn btn--primary btn--lg btn--block mt-16"
-          disabled={busy || code.length < 6}
+          disabled={busy || code.length < CODE_MIN}
           onClick={() => void verify()}
         >
           {busy ? 'Checking…' : 'Sign in'}
