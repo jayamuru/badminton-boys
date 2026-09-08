@@ -68,17 +68,21 @@ export function SignIn() {
       if (error) throw error
       setSent(true)
     } catch (e) {
-      // Supabase's built-in email sender is capped at a couple of messages an
-      // hour for the *whole project*, so this fires on the third person trying
-      // to sign in rather than on anything the person in front of it did. The
-      // real fix is custom SMTP (DEPLOY.md §1.5); until then, say what's
-      // happening instead of showing them a server string about rate limits.
+      // Both of these are the app's problem, not the reader's, and the raw
+      // strings ("Error sending magic link email") invite them to retype a
+      // perfectly good address forever. Say who has to fix it instead.
+      //
+      // Rate limits: the sender is capped per hour for the whole project, so
+      // this fires on the third person to sign in rather than on anything they
+      // did. Send failures: a rejected or misconfigured SMTP relay. Both are
+      // settings on the server — see DEPLOY.md §1.
+      const message = e instanceof Error ? e.message : ''
       setErr(
-        e instanceof Error && /rate limit/i.test(e.message)
+        /rate limit/i.test(message)
           ? "Too many sign-in emails have gone out from this app in the last hour, so the server won't send another one yet. Wait a few minutes and try again."
-          : e instanceof Error
-            ? e.message
-            : 'Could not send the code',
+          : /sending|smtp|magic link/i.test(message)
+            ? "The app couldn't send that email. Nothing's wrong with your address — this is the app's email setup, so tell whoever runs it."
+            : message || 'Could not send the code',
       )
     } finally {
       setBusy(false)
