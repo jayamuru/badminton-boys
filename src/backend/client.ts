@@ -50,3 +50,39 @@ export function db(): SupabaseClient {
   if (!supabase) throw new Error('Supabase is not configured')
   return supabase
 }
+
+/**
+ * A failed email link, read off the URL Supabase bounced us back to.
+ *
+ * Supabase reports these in the query string *and* the fragment, which is a
+ * problem here twice over: the fragment is where HashRouter keeps the route, so
+ * `#error=access_denied&...` parses as a nonsense path and the app renders a
+ * blank screen instead of an explanation. Grab the message, put the URL back to
+ * something the router understands, and let the sign-in screen say what went
+ * wrong.
+ *
+ * Read at module load, before the router mounts. Deliberately never touches a
+ * URL carrying `code=` — that one is a *successful* PKCE handshake that the
+ * client above still needs to exchange.
+ */
+export const authRedirectError: string | null = (() => {
+  if (typeof window === 'undefined') return null
+  const { search, hash, origin, pathname } = window.location
+  const fragment = hash.startsWith('#/') ? '' : hash.replace(/^#/, '')
+  const params = new URLSearchParams(search.replace(/^\?/, ''))
+  const fromHash = new URLSearchParams(fragment)
+  const code = params.get('error_code') ?? fromHash.get('error_code')
+  const description = params.get('error_description') ?? fromHash.get('error_description')
+  if (!code && !description) return null
+
+  // Expired *or* already used. A one-time link that fails on the first human
+  // click has usually been opened by something else first — mail providers
+  // routinely fetch links to scan them, which spends the token.
+  const message =
+    code === 'otp_expired'
+      ? 'That sign-in link had already been used or had expired. Email links get consumed by spam scanners before you ever tap them, which is why the six digit code is the reliable way in.'
+      : (description?.replace(/\+/g, ' ') ?? 'That sign-in link did not work.')
+
+  window.history.replaceState(null, '', `${origin}${pathname}#/`)
+  return message
+})()

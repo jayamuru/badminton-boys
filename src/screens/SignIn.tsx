@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { db, isNativeApp } from '../backend/client'
+import { authRedirectError, db, isNativeApp } from '../backend/client'
 import { useApp } from '../store/AppStore'
 import { Logo } from '../components/Logo'
 
@@ -18,7 +18,7 @@ export function SignIn() {
   const [code, setCode] = useState('')
   const [sent, setSent] = useState(false)
   const [busy, setBusy] = useState(false)
-  const [err, setErr] = useState<string | null>(null)
+  const [err, setErr] = useState<string | null>(authRedirectError)
 
   const sendCode = async () => {
     const address = email.trim()
@@ -97,7 +97,11 @@ export function SignIn() {
         <h1 className="onb__title">Check your email</h1>
         <p className="onb__body">
           We sent a six digit code to <strong>{email.trim()}</strong>. Type it in below.
-          {!isNativeApp && ' The link in that email works too.'}
+        </p>
+        <p className="micro dim mt-8">
+          Only a link in that email and no code? The Supabase <em>Magic Link</em> template
+          is missing <code>{'{{ .Token }}'}</code> — see DEPLOY.md §1. Don't tap the link:
+          it's one-time, and mail scanners usually spend it before you can.
         </p>
 
         <label className="field mt-24">
