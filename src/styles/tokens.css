@@ -1,0 +1,108 @@
+/* ==========================================================================
+   BADMINTON BOYS — design tokens
+   Dark-first. True black base so OLED panels idle near zero draw during a
+   match, with a single high-voltage accent doing all the shouting.
+   ========================================================================== */
+
+:root {
+  /* --- surfaces: true black up through four elevation steps --- */
+  --bg: #000000;
+  --surface: #0b0d10;
+  --surface-2: #12151a;
+  --surface-3: #1a1e26;
+  --elev: #22262f;
+
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.16);
+
+  /* --- ink --- */
+  --text: #ffffff; /* shuttlecock white */
+  --text-2: #a7b0bd;
+  --text-3: #6b7482;
+  --text-4: #464e5a;
+
+  /* --- accents --- */
+  --neon: #c8ff2e; /* the one loud colour */
+  --neon-2: #9be600;
+  --neon-ink: #0c1400;
+  --neon-glow: rgba(200, 255, 46, 0.35);
+
+  --live: #ff2d46;
+  --live-glow: rgba(255, 45, 70, 0.4);
+
+  --win: #22e58a;
+  --loss: #ff5a5f;
+  --blue: #5ac8fa;
+  --violet: #8b7cff;
+  --orange: #ff8a3d;
+
+  --gold: #ffc83d;
+  --silver: #cbd5e1;
+  --bronze: #e0854b;
+
+  /* --- radii --- */
+  --r-xs: 8px;
+  --r-sm: 12px;
+  --r: 16px;
+  --r-lg: 22px;
+  --r-xl: 28px;
+  --r-pill: 999px;
+
+  /* --- elevation --- */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.6);
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.7);
+  --glow-neon: 0 0 0 1px rgba(200, 255, 46, 0.25), 0 8px 32px rgba(200, 255, 46, 0.14);
+  --glow-live: 0 0 0 1px rgba(255, 45, 70, 0.3), 0 6px 28px rgba(255, 45, 70, 0.16);
+
+  /* --- type --- */
+  --font: 'Inter Tight', 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI',
+    Roboto, Helvetica, Arial, sans-serif;
+
+  --t-display: 800 clamp(40px, 13vw, 64px) / 0.9 var(--font);
+  --t-h1: 800 28px/1.1 var(--font);
+  --t-h2: 750 20px/1.2 var(--font);
+  --t-h3: 700 16px/1.25 var(--font);
+  --t-body: 500 15px/1.45 var(--font);
+  --t-small: 500 13px/1.4 var(--font);
+  --t-micro: 700 11px/1.2 var(--font);
+
+  /* --- layout --- */
+  --shell: 460px;
+  --tabbar-h: 68px;
+
+  /*
+   * The side gutter. Phones with curved edges bend the outermost few pixels
+   * away from you, so content sitting flush against the bezel reads as clipped
+   * even when it isn't. `--gut` folds in whatever the device reports as unsafe
+   * (a notch in landscape, a cutout) on top of the base gutter.
+   */
+  --pad: 20px;
+  --gut-l: max(var(--pad), env(safe-area-inset-left, 0px));
+  --gut-r: max(var(--pad), env(safe-area-inset-right, 0px));
+
+  /* --- motion --- */
+  --ease: cubic-bezier(0.22, 0.9, 0.3, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --fast: 140ms;
+  --med: 260ms;
+  --slow: 460ms;
+}
+
+/* An eye-level scoreboard needs numbers that never reflow as they tick. */
+.num {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  font-feature-settings: 'tnum' 1, 'ss01' 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

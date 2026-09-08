@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      The adaptive icon's background layer. Sampled from the artwork's own
+      corners so the launcher's mask can't reveal a seam around the logo.
+      (Capacitor's default here was #FFFFFF, which framed a dark icon in white.)
+    -->
+    <color name="ic_launcher_background">#0C1322</color>
+</resources>

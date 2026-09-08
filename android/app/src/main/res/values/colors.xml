@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Badminton Boys palette. Matches src/styles/tokens.css. -->
+    <color name="black">#FF000000</color>
+    <color name="surface">#FF0B0D10</color>
+    <color name="neon">#FFC8FF2E</color>
+
+    <color name="colorPrimary">#FF000000</color>
+    <color name="colorPrimaryDark">#FF000000</color>
+    <color name="colorAccent">#FFC8FF2E</color>
+</resources>
