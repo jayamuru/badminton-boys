@@ -131,6 +131,16 @@ opaque auth failure rather than "wrong region".
    That creates an IAM user with `ses:SendRawEmail` and shows a username and password
    **once** — download the CSV.
 
+   Use the **SMTP settings** page near the top of the nav, not **Mail Manager → Ingress
+   endpoints** further down. Mail Manager is SES's *inbound* routing product: it also hands
+   you a host and a username, so it looks like the right answer, but it receives mail rather
+   than sending it. Two ways to tell them apart — a sending host is
+   `email-smtp.<region>.amazonaws.com` (a Mail Manager one contains `mail-manager-smtp`),
+   and a sending username is an IAM access key ID beginning `AKIA` (a Mail Manager one
+   begins `inp-`). An ingress endpoint is also billed hourly for as long as it exists, so
+   delete it if you created one by mistake — endpoint first, then its rule set and traffic
+   policy.
+
    These are *not* your AWS access key and secret. The SMTP password is derived from the
    secret key by a signing algorithm, so pasting the IAM secret directly will fail to
    authenticate. If you lose the password, generate new credentials; it can't be re-shown.
