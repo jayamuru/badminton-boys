@@ -15,7 +15,7 @@ export interface Player {
   id: string
   name: string
   handle: string
-  emoji: string
+  /** Avatar colour. The avatar itself is the player's initials — see `initials()`. */
   tint: string
   level: Level
   rating: number
@@ -121,7 +121,6 @@ export interface Challenge {
 
 export interface AppNotification {
   id: string
-  icon: string
   text: string
   at: number
   read: boolean

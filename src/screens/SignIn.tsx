@@ -62,7 +62,12 @@ export function SignIn() {
 
   const sendCode = async () => {
     const address = email.trim()
-    if (!address) return
+    if (!address) {
+      // Say why rather than sitting there dead: a greyed-out primary with no
+      // explanation is the least helpful thing this screen could do.
+      setErr('Enter your email address first.')
+      return
+    }
     setBusy(true)
     setErr(null)
     try {
@@ -154,7 +159,7 @@ export function SignIn() {
   if (sent) {
     return (
       <div className="onb">
-        <div className="onb__art">📬</div>
+        <div className="onb__photo onb__photo--feather" role="presentation" />
         <h1 className="onb__title">Check your email</h1>
         <p className="onb__body">
           We sent a sign-in code to <strong>{email.trim()}</strong>. Type it in below.
@@ -248,7 +253,7 @@ export function SignIn() {
 
         <button
           className="btn btn--primary btn--lg btn--block"
-          disabled={busy || !email.trim()}
+          disabled={busy}
           onClick={() => void sendCode()}
         >
           {busy ? 'Sending…' : 'Email me a sign-in code'}
@@ -259,15 +264,17 @@ export function SignIn() {
         </div>
 
         <button className="btn btn--block" disabled={busy} onClick={guest}>
-          👀 Have a look around as a guest
+          Have a look around as a guest
         </button>
-        <p className="micro center">
+        {/* Sentence case, not `.micro` — that's an all-caps label style, and a
+            two-line sentence set in it is a chore to read. */}
+        <p className="small dim center mt-8">
           A guest is a fresh throwaway account every time. Use your email if you want the
           same player card and rating to be here next time.
         </p>
       </div>
 
-      <p className="micro center mt-16">
+      <p className="small dim center mt-16">
         Everyone who signs in here shares the same players, matches and leaderboards.
       </p>
     </div>
@@ -290,7 +297,7 @@ export function CloudError() {
   const { cloud } = useApp()
   return (
     <div className="onb center">
-      <div className="onb__art">📡</div>
+      <div className="onb__photo onb__photo--mesh" role="presentation" />
       <h1 className="onb__title">Can't reach the server</h1>
       <p className="onb__body">{cloud.error ?? 'Something went wrong on the way to the database.'}</p>
       <button className="btn btn--primary btn--block mt-24" onClick={() => location.reload()}>

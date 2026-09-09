@@ -4,7 +4,6 @@ import { sideOf, type PlayerStats } from './stats'
 
 export interface Achievement {
   id: string
-  emoji: string
   title: string
   detail: string
   /** 0..1 */
@@ -49,56 +48,48 @@ const clamp01 = (n: number) => Math.max(0, Math.min(1, n))
 export const ACHIEVEMENTS: Achievement[] = [
   {
     id: 'first-match',
-    emoji: '🏸',
     title: 'First Match',
     detail: 'Played your first match',
     progress: (c) => clamp01(c.stats.matches / 1),
   },
   {
     id: 'on-fire',
-    emoji: '🔥',
     title: 'On Fire',
     detail: 'Won 5 in a row',
     progress: (c) => clamp01(c.stats.bestStreak / 5),
   },
   {
     id: 'comeback-king',
-    emoji: '💪',
     title: 'Comeback King',
     detail: 'Won a game after trailing by 5+',
     progress: (c) => (hadComeback(c.player.id, c.matches) ? 1 : 0),
   },
   {
     id: 'rating-1000',
-    emoji: '🎯',
     title: '1000 Rating Club',
     detail: 'Reached a 1,000 rating',
     progress: (c) => clamp01(c.player.rating / 1000),
   },
   {
     id: 'top-10',
-    emoji: '👑',
     title: 'Top 10',
     detail: 'Broke into the top 10',
     progress: (c) => (c.player.rating >= 1150 ? 1 : clamp01(c.player.rating / 1150)),
   },
   {
     id: 'fifty-matches',
-    emoji: '🏆',
     title: '50 Matches',
     detail: 'Played 50 matches',
     progress: (c) => clamp01(c.stats.matches / 50),
   },
   {
     id: 'century',
-    emoji: '💯',
     title: 'Point Machine',
     detail: 'Scored 1,000 career points',
     progress: (c) => clamp01(c.stats.pointsWon / 1000),
   },
   {
     id: 'champion',
-    emoji: '🏅',
     title: 'Champion',
     detail: 'Won a tournament match',
     progress: (c) =>

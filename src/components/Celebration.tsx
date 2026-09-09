@@ -4,7 +4,7 @@ import { computeState, gamesList } from '../engine/scoring'
 import { teamName } from '../lib/format'
 
 /**
- * Shown the instant a match is decided. Deliberately restrained: a trophy, the
+ * Shown the instant a match is decided. Deliberately restrained: one word, the
  * winner, the scoreline, one sweep of light. No confetti, no cartoon sounds —
  * this has to look right on a club's tournament screen.
  */
@@ -29,13 +29,13 @@ export function Celebration() {
 
   return (
     <div className="celebrate" onClick={() => dispatch({ type: 'dismissCelebration' })}>
-      <span className="celebrate__trophy">🏆</span>
+      {/* The trophy emoji that used to sit here said nothing the word doesn't.
+          "WINNER" also makes the old "WINS" line below the name redundant. */}
+      <span className="celebrate__trophy">WINNER</span>
       <div className="celebrate__winner">{teamName(winners, playerById, true).toUpperCase()}</div>
-      <div className="micro" style={{ letterSpacing: '0.3em' }}>
-        WINS
-      </div>
       <div className="celebrate__line num mt-12">
-        {games.map((g) => `${g.a}–${g.b}`).join('   ')}
+        {/* A run of spaces collapses to one in HTML, which ran the games together. */}
+        {games.map((g) => `${g.a}–${g.b}`).join(' · ')}
       </div>
       <p className="small dim mt-24">Tap to continue</p>
     </div>

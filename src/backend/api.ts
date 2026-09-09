@@ -291,7 +291,6 @@ export async function pushAction(action: Action, after: State, myId: string): Pr
       await s.from('notifications').insert({
         id: n.id,
         profile_id: myId,
-        icon: n.icon,
         text: n.text,
         link: n.link ?? null,
         read: n.read,

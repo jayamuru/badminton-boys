@@ -67,7 +67,6 @@ export function CreateMatch() {
       type: 'notify',
       notification: {
         id: uid('n'),
-        icon: '🏸',
         text: `Invitation sent to ${teamName(opponents, playerById)}`,
         at: Date.now(),
         read: false,
@@ -98,15 +97,15 @@ export function CreateMatch() {
             <TypeCard
               active={type === 'Singles'}
               title="Singles"
-              sub="1 v 1"
-              art="👤  vs  👤"
+              sub="Just you and one opponent"
+              art="1 v 1"
               onClick={() => setType('Singles')}
             />
             <TypeCard
               active={type === 'Doubles'}
               title="Doubles"
-              sub="2 v 2"
-              art="👥  vs  👥"
+              sub="You and a partner against a pair"
+              art="2 v 2"
               onClick={() => setType('Doubles')}
             />
           </div>
@@ -304,7 +303,8 @@ const TypeCard = ({
         <div className="h2">{title}</div>
         <div className="small dim mt-4">{sub}</div>
       </div>
-      <div style={{ fontSize: 20, letterSpacing: 2 }}>{art}</div>
+      {/* The formation, set large — this slot used to be an emoji. */}
+      <div className="type-card__art num">{art}</div>
     </div>
   </button>
 )
@@ -384,7 +384,7 @@ function PlayerStep({
       )}
 
       <div className="search mb-12">
-        <span className="search__icon">🔍</span>
+        
         <input
           className="input"
           placeholder="Search by name, @handle or level"
@@ -407,7 +407,7 @@ function PlayerStep({
                 {p.name}
               </span>
               <span className="mrow__meta">
-                @{p.handle} · {p.level} · ⭐ {p.rating} · {stats[p.id]?.wins ?? 0}W
+                @{p.handle} · {p.level} · {p.rating} · {stats[p.id]?.wins ?? 0}W
               </span>
             </span>
             <span className="presult__check">{selected(p.id) ? '✓' : ''}</span>

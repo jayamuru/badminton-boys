@@ -4,7 +4,7 @@ import { useApp } from '../store/AppStore'
 import { MIN_RATE_MATCHES, leaderboard, type LeaderboardKey } from '../engine/stats'
 import { tierFor } from '../engine/rating'
 import type { Player } from '../types'
-import { nf, pct, rankMedal } from '../lib/format'
+import { nf, pct, rankTone } from '../lib/format'
 import { Avatar, Chips, FormDots, Segmented, SectionHead } from '../components/ui'
 import { ExportSheet } from '../components/ExportSheet'
 
@@ -12,11 +12,11 @@ type Scope = 'global' | 'india' | 'city' | 'club' | 'friends'
 type View = 'ranking' | 'table'
 
 const SCOPES: { value: Scope; label: string }[] = [
-  { value: 'global', label: '🌎 Global' },
-  { value: 'india', label: '🇮🇳 India' },
-  { value: 'city', label: '📍 Bengaluru' },
-  { value: 'club', label: '🏢 My club' },
-  { value: 'friends', label: '👥 Friends' },
+  { value: 'global', label: 'Global' },
+  { value: 'india', label: 'India' },
+  { value: 'city', label: 'Bengaluru' },
+  { value: 'club', label: 'My club' },
+  { value: 'friends', label: 'Friends' },
 ]
 
 const BOARDS: { value: LeaderboardKey; label: string }[] = [
@@ -72,11 +72,11 @@ export function Leaderboard() {
   }
 
   return (
-    <>
+    <div className="page">
       <header className="topbar topbar--flush">
         <h1 className="h1 grow">Leaderboard</h1>
-        <button className="icon-btn" onClick={() => setShowExport(true)} aria-label="Export top 10">
-          ⇪
+        <button className="text-btn" onClick={() => setShowExport(true)}>
+          Export
         </button>
       </header>
 
@@ -107,7 +107,7 @@ export function Leaderboard() {
                   className={`podium__slot${i === 1 ? ' podium__slot--1' : ''}`}
                   onClick={() => nav(`/player/${r.player.id}`)}
                 >
-                  <span className="podium__medal">{rankMedal(r.rank)}</span>
+                  <span className={`podium__medal rank--${rankTone(r.rank)}`}>{r.rank}</span>
                   <Avatar player={r.player} size={i === 1 ? 'lg' : 'md'} />
                   <div className="podium__name truncate">{r.player.name.split(' ')[0]}</div>
                   <div className="podium__rating num">{nf(r.player.rating)}</div>
@@ -130,8 +130,10 @@ export function Leaderboard() {
                   className={`lb-row${r.player.id === me.id ? ' lb-row--me' : ''}`}
                   onClick={() => nav(`/player/${r.player.id}`)}
                 >
-                  <span className={`lb-row__rank${rankMedal(r.rank) ? ' lb-row__rank--medal' : ''}`}>
-                    {rankMedal(r.rank) ?? r.rank}
+                  <span
+                    className={`lb-row__rank${rankTone(r.rank) ? ` lb-row__rank--medal rank--${rankTone(r.rank)}` : ''}`}
+                  >
+                    {r.rank}
                   </span>
                   <Avatar player={r.player} size="sm" />
                   <span className="grow" style={{ minWidth: 0 }}>
@@ -141,7 +143,7 @@ export function Leaderboard() {
                     </span>
                     <span className="lb-row__sub row gap-6">
                       <span style={{ color: tier.color }}>
-                        {tier.emoji} {tier.name}
+                        {tier.name}
                       </span>
                     </span>
                   </span>
@@ -150,7 +152,9 @@ export function Leaderboard() {
                   ) : (
                     <span className="lb-row__value">
                       <b>{v}</b>
-                      <span>{unit}</span>
+                      {/* The unit is the same all the way down the board, so it
+                          only needs saying once at the top. */}
+                      {r.rank === 1 && <span>{unit}</span>}
                     </span>
                   )}
                 </button>
@@ -192,7 +196,7 @@ export function Leaderboard() {
         scope={SCOPES.find((s) => s.value === scope)?.label ?? ''}
         valueFor={(p, s) => valueFor(board, p, s).v}
       />
-    </>
+    </div>
   )
 }
 

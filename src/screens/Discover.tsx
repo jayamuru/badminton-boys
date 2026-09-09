@@ -5,7 +5,7 @@ import { computeState } from '../engine/scoring'
 import { leaderboard } from '../engine/stats'
 import { tierFor } from '../engine/rating'
 import type { Level } from '../types'
-import { clock, dayLabel, firstName, nf, pct, rankMedal } from '../lib/format'
+import { clock, dayLabel, firstName, nf, notificationTag, pct, rankTone } from '../lib/format'
 import { Avatar, BackBar, Chips, Empty, SectionHead, useToast } from '../components/ui'
 import { LiveMatchCard, UpcomingCard } from '../components/MatchCards'
 import { AddPlayerSheet } from '../components/AddPlayer'
@@ -57,7 +57,7 @@ export function FindPlayers() {
         }
       />
       <div className="search mb-12">
-        <span className="search__icon">🔍</span>
+        
         <input
           className="input"
           placeholder="Search by name or @handle"
@@ -101,17 +101,17 @@ export function FindPlayers() {
                     {p.name}
                   </button>
                   <div className="mrow__meta">
-                    ⭐ {nf(p.rating)} · {p.level}
+                    {nf(p.rating)} · {p.level}
                     {demo && ` · ${distance(p.id)} km away`}
                   </div>
                   <div className="micro mt-4" style={{ color: tier.color }}>
-                    {tier.emoji} {tier.name} · {s?.wins ?? 0}W {s?.losses ?? 0}L
+                    {tier.name} · {s?.wins ?? 0}W {s?.losses ?? 0}L
                   </div>
                 </div>
               </div>
               <div className="row gap-8 mt-12">
                 <button
-                  className="btn btn--sm btn--primary grow"
+                  className="btn btn--sm btn--accent grow"
                   onClick={() => {
                     dispatch({
                       type: 'createChallenge',
@@ -128,7 +128,7 @@ export function FindPlayers() {
                     toast(`Challenge sent to ${firstName(p)}`)
                   }}
                 >
-                  ⚔️ Challenge
+                  Challenge
                 </button>
                 <button className="btn btn--sm grow" onClick={() => nav(`/h2h/${me.id}/${p.id}`)}>
                   Head to head
@@ -139,7 +139,6 @@ export function FindPlayers() {
         })}
         {!results.length && (
           <Empty
-            glyph={q || level !== 'all' ? '🔍' : '👥'}
             title={q || level !== 'all' ? 'No players found' : 'No players yet'}
             body={
               q || level !== 'all'
@@ -195,7 +194,7 @@ export function FindClubs() {
                   View club
                 </button>
                 <button
-                  className={`btn btn--sm grow${joined ? '' : ' btn--primary'}`}
+                  className={`btn btn--sm grow${joined ? '' : ' btn--accent'}`}
                   disabled={joined}
                   onClick={() => {
                     dispatch({ type: 'joinClub', clubId: c.id })
@@ -232,7 +231,7 @@ export function ClubDetail() {
     return (
       <div className="page">
         <BackBar title="Club" />
-        <Empty glyph="🏸" title="Club not found" body="This community no longer exists." />
+        <Empty title="Club not found" body="This community no longer exists." />
       </div>
     )
   }
@@ -261,7 +260,7 @@ export function ClubDetail() {
 
       {club.announcement && (
         <div className="card card--neon mt-16">
-          <p className="micro">📣 Announcement</p>
+          <p className="micro">Announcement</p>
           <p className="small mt-8">{club.announcement}</p>
         </div>
       )}
@@ -319,7 +318,7 @@ export function ClubDetail() {
       <div>
         {board.slice(0, 10).map((r) => (
           <button key={r.player.id} className="lb-row" onClick={() => nav(`/player/${r.player.id}`)}>
-            <span className="lb-row__rank">{rankMedal(r.rank) ?? r.rank}</span>
+            <span className={`lb-row__rank${rankTone(r.rank) ? ` rank--${rankTone(r.rank)}` : ''}`}>{r.rank}</span>
             <Avatar player={r.player} size="sm" />
             <span className="grow" style={{ minWidth: 0 }}>
               <span className="lb-row__name truncate" style={{ display: 'block' }}>
@@ -372,9 +371,12 @@ export function Notifications() {
             onClick={() => n.link && nav(n.link)}
           >
             <div className="row gap-8">
-              <span style={{ fontSize: 18 }}>{n.icon}</span>
               <span className="grow">
-                <span className="small" style={{ color: n.read ? 'var(--text-2)' : 'var(--text)' }}>
+                <span className="pulse__tag">{notificationTag(n.link)}</span>
+                <span
+                  className="small"
+                  style={{ display: 'block', color: n.read ? 'var(--text-2)' : 'var(--text)' }}
+                >
                   {n.text}
                 </span>
                 <div className="mrow__meta">
@@ -385,7 +387,7 @@ export function Notifications() {
           </button>
         ))}
         {!state.notifications.length && (
-          <Empty glyph="🔔" title="Nothing yet" body="Match reminders, challenges and ranking moves land here." />
+          <Empty title="Nothing yet" body="Match reminders, challenges and ranking moves land here." />
         )}
       </div>
     </div>
@@ -406,7 +408,7 @@ export function TournamentScreen() {
     return (
       <div className="page">
         <BackBar title="Tournament" />
-        <Empty glyph="🏆" title="No tournament here" body="It may have finished or been removed." />
+        <Empty title="No tournament here" body="It may have finished or been removed." />
       </div>
     )
   }
@@ -420,7 +422,7 @@ export function TournamentScreen() {
     <div className="page">
       <BackBar title={t.name} />
       <div className="row gap-8 wrap">
-        <span className="pill pill--gold">🏆 {t.stage.toUpperCase()} STAGE</span>
+        <span className="pill pill--gold">{t.stage.toUpperCase()} STAGE</span>
         <span className="pill">{t.playerIds.length} players</span>
         <span className="pill">{t.courts} courts</span>
         <span className="pill">{t.format}</span>

@@ -15,7 +15,6 @@ const you: Player = {
   id: 'me',
   name: 'You',
   handle: 'you',
-  emoji: '🏸',
   tint: '#C8FF2E',
   level: 'Intermediate',
   rating: 1000,

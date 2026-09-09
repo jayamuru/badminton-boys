@@ -24,7 +24,7 @@ export function PlayerProfile() {
     return (
       <div className="page">
         <BackBar title="Player" />
-        <Empty glyph="👤" title="Player not found" body="This profile no longer exists." />
+        <Empty title="Player not found" body="This profile no longer exists." />
       </div>
     )
   }
@@ -91,12 +91,12 @@ function PlayerView({ player, isMe }: { player: Player; isMe: boolean }) {
   }, [myMatches])
 
   return (
-    <>
+    <div className="page">
       {isMe ? (
         <header className="topbar topbar--flush">
           <h1 className="h1 grow">Profile</h1>
-          <button className="icon-btn" onClick={() => setShowSettings(true)} aria-label="Settings">
-            ⚙
+          <button className="text-btn" onClick={() => setShowSettings(true)}>
+            Settings
           </button>
         </header>
       ) : (
@@ -108,9 +108,9 @@ function PlayerView({ player, isMe }: { player: Player; isMe: boolean }) {
         <h1 className="profile-hero__name">{player.name}</h1>
         <p className="small dim mt-4">@{player.handle}</p>
         <div className="profile-hero__meta">
-          <span className="pill">🏸 {player.level}</span>
-          <span className="pill">📍 {player.city}</span>
-          {stats.streak > 0 && <span className="pill pill--win">🔥 {stats.streak} in a row</span>}
+          <span className="pill">{player.level}</span>
+          <span className="pill">{player.city}</span>
+          {stats.streak > 0 && <span className="pill pill--win">{stats.streak} in a row</span>}
         </div>
         {player.bio && <p className="small muted mt-12">{player.bio}</p>}
       </div>
@@ -121,7 +121,7 @@ function PlayerView({ player, isMe }: { player: Player; isMe: boolean }) {
             className="btn btn--primary grow"
             onClick={() => nav(`/create?mode=challenge&opponent=${player.id}`)}
           >
-            ⚔️ Challenge
+            Challenge
           </button>
           <button
             className={`btn grow${following ? '' : ' btn--ghost'}`}
@@ -132,8 +132,8 @@ function PlayerView({ player, isMe }: { player: Player; isMe: boolean }) {
           >
             {following ? 'Following ✓' : 'Follow'}
           </button>
-          <button className="btn" onClick={() => nav(`/h2h/${me.id}/${player.id}`)} aria-label="Head to head">
-            ⚖️
+          <button className="btn" onClick={() => nav(`/h2h/${me.id}/${player.id}`)}>
+            Head to head
           </button>
         </div>
       )}
@@ -141,15 +141,15 @@ function PlayerView({ player, isMe }: { player: Player; isMe: boolean }) {
       {/* Rating and ranking are different things — keep them visually separate. */}
       <div className="rating-block">
         <div>
-          <div className="rating-block__k">⭐ Rating</div>
+          <div className="rating-block__k">Rating</div>
           <div className="rating-block__v num">{nf(player.rating)}</div>
           <div className="micro mt-4" style={{ color: tier.color }}>
-            {tier.emoji} {tier.name}
+            {tier.name}
           </div>
         </div>
         <div className="rating-block__div" />
         <div>
-          <div className="rating-block__k">🏆 Ranking</div>
+          <div className="rating-block__k">Ranking</div>
           <div className="rating-block__v num">#{cityRank}</div>
           <div className="micro mt-4">{player.city}</div>
         </div>
@@ -158,7 +158,7 @@ function PlayerView({ player, isMe }: { player: Player; isMe: boolean }) {
       {next && (
         <div className="mt-12">
           <div className="row-between mb-8">
-            <span className="micro">Next tier · {next.emoji} {next.name}</span>
+            <span className="micro">Next tier · {next.name}</span>
             <span className="micro">{next.min - player.rating} to go</span>
           </div>
           <Bar value={(player.rating - tier.min) / (next.min - tier.min)} color={next.color} />
@@ -200,9 +200,12 @@ function PlayerView({ player, isMe }: { player: Player; isMe: boolean }) {
             <Stat value={stats.losses} label="Losses" tone="loss" />
           </div>
           <div className="stat-grid mt-8">
-            <Stat value={stats.matches ? pct(stats.winRate, 1) : '—'} label="Win rate" tone="neon" />
+            {/* Only won/lost earns a colour here — tinting win rate and best
+                streak too put five hues in one nine-cell grid and made none of
+                them mean anything. */}
+            <Stat value={stats.matches ? pct(stats.winRate, 1) : '—'} label="Win rate" />
             <Stat value={`${stats.gamesWon}/${stats.gamesWon + stats.gamesLost}`} label="Games" />
-            <Stat value={stats.bestStreak} label="Best streak" tone="gold" />
+            <Stat value={stats.bestStreak} label="Best streak" />
           </div>
           <div className="stat-grid mt-8">
             <Stat value={nf(stats.pointsWon)} label="Points won" />
@@ -256,7 +259,9 @@ function PlayerView({ player, isMe }: { player: Player; isMe: boolean }) {
                           {p.matches} played · {p.wins}W {p.losses}L
                         </span>
                       </span>
-                      <span className="podium-row__pts neon">{pct(p.winRate, 0)}</span>
+                      {/* Not lime: a 40% partnership rendered in the "tap me"
+                          colour reads as a good number and as a control. */}
+                      <span className="podium-row__pts">{pct(p.winRate, 0)}</span>
                     </button>
                   )
                 })}
@@ -310,7 +315,6 @@ function PlayerView({ player, isMe }: { player: Player; isMe: boolean }) {
           <div className="badges">
             {badges.map((b) => (
               <div key={b.id} className={`badge${b.unlocked ? ' badge--on' : ''}`} title={b.detail}>
-                <span className="badge__glyph">{b.emoji}</span>
                 <span className="badge__name">{b.title}</span>
                 {!b.unlocked && b.pct > 0 && (
                   <span className="badge__progress" style={{ width: `${b.pct * 100}%` }} />
@@ -318,22 +322,24 @@ function PlayerView({ player, isMe }: { player: Player; isMe: boolean }) {
               </div>
             ))}
           </div>
-          <div className="card mt-16">
-            {badges
-              .filter((b) => !b.unlocked)
-              .slice(0, 3)
-              .map((b) => (
-                <div key={b.id} style={{ padding: '8px 0' }}>
-                  <div className="row-between mb-8">
-                    <span className="small">
-                      {b.emoji} {b.detail}
-                    </span>
-                    <span className="micro">{Math.round(b.pct * 100)}%</span>
+          {/* Nothing left to chase once every badge is unlocked — an empty card
+              here just reads as a rendering fault. */}
+          {unlocked < badges.length && (
+            <div className="card mt-16">
+              {badges
+                .filter((b) => !b.unlocked)
+                .slice(0, 3)
+                .map((b) => (
+                  <div key={b.id} style={{ padding: '8px 0' }}>
+                    <div className="row-between mb-8">
+                      <span className="small">{b.detail}</span>
+                      <span className="micro">{Math.round(b.pct * 100)}%</span>
+                    </div>
+                    <Bar value={b.pct} />
                   </div>
-                  <Bar value={b.pct} />
-                </div>
-              ))}
-          </div>
+                ))}
+            </div>
+          )}
         </>
       )}
 
@@ -374,6 +380,15 @@ function PlayerView({ player, isMe }: { player: Player; isMe: boolean }) {
           <button className="btn btn--block" onClick={() => nav('/welcome')}>
             Replay onboarding
           </button>
+          <button
+            className="btn btn--block"
+            onClick={() => {
+              setShowSettings(false)
+              nav('/credits')
+            }}
+          >
+            Credits
+          </button>
 
           {cloud.enabled ? (
             <button
@@ -407,7 +422,7 @@ function PlayerView({ player, isMe }: { player: Player; isMe: boolean }) {
                 nav('/players')
               }}
             >
-              🧹 Clear demo data & start fresh
+              Clear demo data & start fresh
             </button>
           )}
 
@@ -426,6 +441,6 @@ function PlayerView({ player, isMe }: { player: Player; isMe: boolean }) {
           )}
         </div>
       </Sheet>
-    </>
+    </div>
   )
 }

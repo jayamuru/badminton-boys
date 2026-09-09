@@ -17,7 +17,6 @@ export interface ProfileRow {
   user_id: string | null
   name: string
   handle: string
-  emoji: string
   tint: string
   level: Player['level']
   rating: number
@@ -93,7 +92,6 @@ export interface ChallengeRow {
 
 export interface NotificationRow {
   id: string
-  icon: string
   text: string
   link: string | null
   read: boolean
@@ -112,7 +110,6 @@ export const toPlayer = (r: ProfileRow): Player => ({
   id: r.id,
   name: r.name,
   handle: r.handle,
-  emoji: r.emoji,
   tint: r.tint,
   level: r.level,
   rating: r.rating,
@@ -186,7 +183,6 @@ export const toChallenge = (r: ChallengeRow): Challenge => ({
 
 export const toNotification = (r: NotificationRow): AppNotification => ({
   id: r.id,
-  icon: r.icon,
   text: r.text,
   link: r.link ?? undefined,
   read: r.read,
@@ -200,7 +196,6 @@ export const fromPlayer = (p: Player, userId?: string | null, createdBy?: string
   user_id: userId ?? null,
   name: p.name,
   handle: p.handle,
-  emoji: p.emoji,
   tint: p.tint,
   level: p.level,
   city: p.city,

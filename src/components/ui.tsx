@@ -7,11 +7,20 @@ import {
   useState,
   type ReactNode,
 } from 'react'
+import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import type { Player } from '../types'
+import { initials } from '../lib/format'
+import { AVATAR_TINTS } from '../lib/tints'
 
 /* --- avatar --------------------------------------------------------------- */
 
+/**
+ * Initials on the player's tint. This used to be an emoji animal, which meant
+ * every avatar was drawn by the device's emoji font — different on every phone,
+ * unreadable at 24px, and telling you nothing about who the person was.
+ * Initials scale down cleanly and actually identify someone.
+ */
 export function Avatar({
   player,
   size = 'md',
@@ -28,7 +37,41 @@ export function Avatar({
       style={{ ['--tint' as string]: player.tint }}
       aria-label={player.name}
     >
-      <span className="avatar__glyph">{player.emoji}</span>
+      <span className="avatar__glyph">{initials(player.name)}</span>
+    </div>
+  )
+}
+
+/**
+ * Pick your avatar colour. It replaces the old grid of animal emoji: there's
+ * only one thing to choose now, and each swatch previews the initials you'll
+ * actually be wearing rather than a mascot you have to squint at.
+ */
+export function TintPicker({
+  value,
+  onChange,
+  name,
+}: {
+  value: string
+  onChange: (tint: string) => void
+  name: string
+}) {
+  const mark = initials(name || '?')
+  return (
+    <div className="tint-grid">
+      {AVATAR_TINTS.map((t) => (
+        <button
+          key={t}
+          type="button"
+          className="tint-swatch"
+          style={{ ['--tint' as string]: t }}
+          aria-pressed={value === t}
+          aria-label={`Avatar colour ${t}`}
+          onClick={() => onChange(t)}
+        >
+          {mark}
+        </button>
+      ))}
     </div>
   )
 }
@@ -195,7 +238,10 @@ export function Sheet({
   }, [open, onClose])
 
   if (!open) return null
-  return (
+  // Rendered on `body` rather than in place: a sheet is a full-screen overlay,
+  // and anything that makes an ancestor a stacking context (a transform on the
+  // page, a filter on a card) would otherwise slide it under the tab bar.
+  return createPortal(
     <div className="scrim" onClick={onClose} role="dialog" aria-modal="true">
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
         <div className="sheet__grab" />
@@ -203,29 +249,31 @@ export function Sheet({
         {subtitle && <p className="small dim mb-12">{subtitle}</p>}
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 
 /* --- action row ----------------------------------------------------------- */
 
+/**
+ * A row you tap. The icon tile it used to carry is now a slim colour rule —
+ * it does the same job of telling one row from the next at a glance, without
+ * asking you to decode a pictogram.
+ */
 export const ActionRow = ({
-  icon,
   title,
   sub,
   onClick,
   tint,
 }: {
-  icon: string
   title: string
   sub?: string
   onClick?: () => void
   tint?: string
 }) => (
   <button className="action" onClick={onClick}>
-    <span className="action__icon" style={tint ? { background: tint, color: '#0c1400' } : undefined}>
-      {icon}
-    </span>
+    <span className="action__rule" style={tint ? { background: tint } : undefined} />
     <span className="grow">
       <span className="action__title">{title}</span>
       {sub && <span className="action__sub">{sub}</span>}
@@ -236,21 +284,26 @@ export const ActionRow = ({
 
 /* --- empty state ---------------------------------------------------------- */
 
+/**
+ * Nothing-here state. The photograph carries the mood so the copy doesn't have
+ * to apologise; `art={false}` drops it for the handful of places that sit
+ * inside an already-tight card.
+ */
 export const Empty = ({
-  glyph = '🏸',
   title,
   body,
   cta,
   onCta,
+  art = true,
 }: {
-  glyph?: string
   title: string
   body: string
   cta?: string
   onCta?: () => void
+  art?: boolean
 }) => (
   <div className="empty">
-    <span className="empty__glyph">{glyph}</span>
+    {art && <span className="empty__art" role="presentation" />}
     <h3 className="empty__title">{title}</h3>
     <p className="empty__body">{body}</p>
     {cta && (

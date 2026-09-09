@@ -24,13 +24,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font: 800 17px/1 var(--font);
-  letter-spacing: -0.02em;
-}
-
-.wordmark__shuttle {
-  font-size: 18px;
-  filter: drop-shadow(0 0 8px var(--neon-glow));
+  font: 700 21px/1 var(--font-display);
+  letter-spacing: 0.06em;
 }
 
 .wordmark__bb {
@@ -66,6 +61,38 @@
   border-radius: 50%;
   background: var(--live);
   border: 2px solid var(--bg);
+}
+
+/*
+ * A word where a single symbol used to be. "Share" and "Settings" were ⇪ and
+ * ⚙ — glyphs that render at the mercy of the platform font and mean nothing to
+ * anyone who hasn't already learned them.
+ */
+.text-btn {
+  position: relative;
+  padding: 8px 13px;
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  color: var(--text-2);
+  font: 600 13px/1 var(--font-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: transform var(--fast) var(--ease), background var(--fast);
+}
+.text-btn:active {
+  transform: scale(0.94);
+  background: var(--surface-3);
+  color: var(--text);
+}
+
+/* Your own avatar, used as the button into your profile. */
+.avatar-btn {
+  border-radius: 50%;
+  transition: transform var(--fast) var(--ease);
+}
+.avatar-btn:active {
+  transform: scale(0.92);
 }
 
 .back-bar {
@@ -151,9 +178,18 @@
 .btn:active {
   transform: scale(0.96);
 }
+/*
+ * A disabled button goes neutral rather than faded. Fading the lime primary to
+ * 40% over black produced a muddy olive slab — which was the hero element of
+ * the sign-in screen before you had typed an email, and read as broken rather
+ * than as not-ready-yet.
+ */
 .btn:disabled {
-  opacity: 0.4;
   pointer-events: none;
+  background: var(--surface-2);
+  color: var(--text-4);
+  border-color: var(--line);
+  box-shadow: none;
 }
 
 .btn--primary {
@@ -178,9 +214,24 @@
 }
 
 .btn--danger {
-  background: rgba(255, 90, 95, 0.12);
+  background: rgba(255, 97, 104, 0.12);
   color: var(--loss);
-  border-color: rgba(255, 90, 95, 0.3);
+  border-color: rgba(255, 97, 104, 0.3);
+}
+
+/*
+ * The affirmative action in a *repeated* row. A browse list of two dozen
+ * players with a solid --btn--primary on each one turns the whole screen lime
+ * and leaves nothing for the screen's actual primary action to stand out
+ * against. Same meaning, a quarter of the volume.
+ */
+.btn--accent {
+  background: rgba(200, 255, 46, 0.1);
+  color: var(--neon);
+  border-color: rgba(200, 255, 46, 0.28);
+}
+.btn--accent:active {
+  background: rgba(200, 255, 46, 0.18);
 }
 
 .btn--block {
@@ -297,26 +348,36 @@
   border-radius: 50%;
   display: grid;
   place-items: center;
-  font-size: calc(var(--size) * 0.45);
-  background: var(--surface-3);
-  border: 1px solid var(--line);
+  background: var(--tint, var(--surface-3));
   flex: none;
   position: relative;
   overflow: hidden;
 }
 
+/*
+ * A soft highlight so a flat disc reads as an object rather than a colour
+ * swatch, and a hairline so a pale tint still has an edge against the card.
+ */
 .avatar::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 30% 25%, var(--tint), transparent 70%);
-  opacity: 0.28;
+  border-radius: 50%;
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.28), rgba(0, 0, 0, 0.22));
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25);
 }
 
+/*
+ * Initials, in ink dark enough to sit on any of the tints. Sized off --size so
+ * the same component works from the 26px table cell to the 88px profile hero.
+ */
 .avatar__glyph {
   position: relative;
   z-index: 1;
   line-height: 1;
+  font: 800 calc(var(--size) * 0.38) / 1 var(--font-body);
+  letter-spacing: 0.01em;
+  color: rgba(12, 20, 0, 0.82);
 }
 
 .avatar--xs {
@@ -349,9 +410,8 @@
   line-height: 0.9;
 }
 
-.score--xl {
-  font-size: clamp(64px, 22vw, 108px);
-}
+/* The extra-large step lived on the spectate scoreboard, which now sizes its own
+   score against the space the team names need — see `.steam__score`. */
 .score--lg {
   font-size: 40px;
 }
@@ -554,20 +614,10 @@ textarea.input {
   resize: vertical;
 }
 
+/* The magnifier that sat inside the field is gone; the placeholder already says
+   what the box is for, so the input gets its full width back. */
 .search {
   position: relative;
-}
-.search .input {
-  padding-left: 40px;
-}
-.search__icon {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-3);
-  font-size: 15px;
-  pointer-events: none;
 }
 
 /* --- sheet / modal -------------------------------------------------------- */
@@ -641,24 +691,27 @@ textarea.input {
   border-color: var(--line-strong);
 }
 
-.action__icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  display: grid;
-  place-items: center;
-  font-size: 19px;
-  background: var(--surface-3);
+/* Was a 42px icon tile; now a slim colour marker doing the same sorting job. */
+.action__rule {
+  width: 3px;
+  align-self: stretch;
+  min-height: 34px;
+  border-radius: 3px;
+  background: var(--line-strong);
   flex: none;
 }
 
+/* Both are spans, so they need an explicit box to stack rather than run on. */
 .action__title {
-  font: 700 15px/1.2 var(--font);
+  display: block;
+  font: var(--t-h3);
+  letter-spacing: 0.008em;
 }
 .action__sub {
+  display: block;
   font: var(--t-small);
-  color: var(--text-3);
-  margin-top: 2px;
+  color: var(--text-2);
+  margin-top: 3px;
 }
 .action__chev {
   color: var(--text-4);
@@ -697,23 +750,20 @@ textarea.input {
   justify-content: center;
 }
 
-.tab__icon {
-  font-size: 19px;
-  line-height: 1;
-  transition: transform var(--fast) var(--spring);
-}
-
+/* Words, not pictograms — so the label carries the whole tab and can be big
+   enough to read without squinting. */
 .tab__label {
-  font: 700 10px/1 var(--font);
-  letter-spacing: 0.06em;
+  font: 600 14px/1 var(--font-display);
+  letter-spacing: 0.12em;
   text-transform: uppercase;
+  transition: transform var(--fast) var(--spring);
 }
 
 .tab--active {
   color: var(--text);
 }
-.tab--active .tab__icon {
-  transform: translateY(-1px) scale(1.1);
+.tab--active .tab__label {
+  transform: translateY(-1px);
 }
 
 .tab--active::before {
@@ -737,8 +787,9 @@ textarea.input {
   background: var(--live);
 }
 
-/* Centre PLAY tab gets a raised puck. */
-.tab--play .tab__icon {
+/* Centre PLAY tab gets a raised puck. It keeps a symbol because "+" is an
+   action rather than a destination, and nobody has to learn what it means. */
+.tab--play .tab__plus {
   width: 44px;
   height: 44px;
   border-radius: 50%;
@@ -746,8 +797,7 @@ textarea.input {
   color: var(--neon-ink);
   display: grid;
   place-items: center;
-  font-size: 22px;
-  font-weight: 800;
+  font: 400 26px/1 var(--font-body);
   margin-top: -14px;
   box-shadow: var(--glow-neon);
 }
@@ -765,21 +815,20 @@ textarea.input {
   padding: 48px 24px;
 }
 
-.empty__glyph {
-  font-size: 44px;
-  filter: grayscale(0.2);
-  animation: float 4s ease-in-out infinite;
-  display: inline-block;
-}
-
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0) rotate(-6deg);
-  }
-  50% {
-    transform: translateY(-8px) rotate(6deg);
-  }
+/*
+ * A photograph instead of the emoji that used to bob about here. It's the same
+ * shuttlecock shot the rest of the app uses, masked to a disc and dimmed so it
+ * sets the mood without competing with the copy underneath.
+ */
+.empty__art {
+  display: block;
+  width: 116px;
+  height: 116px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: url('../assets/photos/feather.jpg') center / cover no-repeat;
+  filter: grayscale(0.35) contrast(1.05) brightness(0.78);
+  box-shadow: inset 0 0 0 1px var(--line);
 }
 
 .empty__title {

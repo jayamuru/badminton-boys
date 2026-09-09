@@ -61,16 +61,22 @@ export interface Tier {
   name: string
   min: number
   color: string
-  emoji: string
 }
 
-/** Visible ladder tiers — the thing people screenshot. */
+/**
+ * Visible ladder tiers — the thing people screenshot.
+ *
+ * A cool-to-hot ramp, so a glance at the colour already tells you which way up
+ * the ladder goes. None of these is the lime accent or the win/loss pair: those
+ * mean "tap me" and "won/lost" everywhere else, and a tier badge is neither.
+ * The colour is the whole badge now — the name says the rest.
+ */
 export const TIERS: Tier[] = [
-  { name: 'Shuttle Rookie', min: 0, color: '#8A94A6', emoji: '🏸' },
-  { name: 'Rally Regular', min: 950, color: '#5AC8FA', emoji: '🎯' },
-  { name: 'Smash Contender', min: 1100, color: '#C8FF2E', emoji: '⚡' },
-  { name: 'Court Elite', min: 1250, color: '#FFC83D', emoji: '👑' },
-  { name: 'Legend', min: 1400, color: '#FF6B9D', emoji: '🔥' },
+  { name: 'Shuttle Rookie', min: 0, color: '#94A3B8' },
+  { name: 'Rally Regular', min: 950, color: '#56C8F5' },
+  { name: 'Smash Contender', min: 1100, color: '#9A8CFF' },
+  { name: 'Court Elite', min: 1250, color: '#FFC24D' },
+  { name: 'Legend', min: 1400, color: '#FF7A45' },
 ]
 
 export function tierFor(rating: number): Tier {

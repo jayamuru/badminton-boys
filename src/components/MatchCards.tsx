@@ -62,7 +62,7 @@ export function LiveMatchCard({ match }: { match: Match }) {
         <span>GAME {s.gameIndex + 1}</span>
         {s.completed.length > 0 && <span>· {s.completed.map((g) => `${g.a}-${g.b}`).join('  ')}</span>}
         <span className="grow" />
-        <span>🔥 {match.reactions.fire}</span>
+        <span>{match.reactions.fire} reactions</span>
         <span>Watch →</span>
       </div>
     </button>
@@ -114,7 +114,7 @@ export function ResultCard({ match, perspectiveId }: { match: Match; perspective
         {won === null ? (
           <span className="pill">{match.type}</span>
         ) : (
-          <span className={`pill ${won ? 'pill--win' : 'pill--loss'}`}>{won ? '🏆 Won' : 'Lost'}</span>
+          <span className={`pill ${won ? 'pill--win' : 'pill--loss'}`}>{won ? 'Won' : 'Lost'}</span>
         )}
         <span className="court-tag">
           {match.completedAt ? relative(match.completedAt) : dayLabel(match.scheduledAt)}
@@ -194,7 +194,7 @@ export function NextMatchHero({ match }: { match: Match }) {
       </div>
 
       <div className="next__countdown">
-        <span>⏱</span>
+        
         <span>Starts in {countdown(match.scheduledAt)}</span>
       </div>
 

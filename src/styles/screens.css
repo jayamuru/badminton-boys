@@ -4,16 +4,87 @@
 
 /* --- greeting header ------------------------------------------------------ */
 
-.greeting {
-  padding: 4px 0 2px;
+/*
+ * The greeting sits on a full-bleed photograph. `.page` has a side gutter, so
+ * the hero cancels it with negative margins to reach the edges of the shell and
+ * pads its own copy back in.
+ */
+.home-hero {
+  position: relative;
+  margin: 6px calc(var(--gut-r) * -1) 0 calc(var(--gut-l) * -1);
+  min-height: 172px;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  isolation: isolate;
 }
+
+.home-hero__photo {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: url('../assets/photos/shuttle-band.jpg') 62% 44% / cover no-repeat;
+}
+
+/*
+ * Two scrims: one fading the photo into the page along the bottom so there's no
+ * hard seam, one darkening the left where the name sits. Without the second,
+ * white type lands on the white of the shuttlecock and disappears.
+ */
+.home-hero__photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.1) 38%, var(--bg) 100%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.25) 62%, transparent 100%);
+}
+
+.home-hero__copy {
+  padding: 0 var(--gut-r) 16px var(--gut-l);
+}
+
 .greeting__hello {
-  font: var(--t-small);
+  font: var(--t-micro);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   color: var(--text-3);
 }
 .greeting__name {
-  font: 800 26px/1.15 var(--font);
-  letter-spacing: -0.025em;
+  font: 700 clamp(38px, 12vw, 52px) / 0.92 var(--font-display);
+  letter-spacing: 0.01em;
+  margin-top: 2px;
+}
+
+/*
+ * The stat band: three numbers, flat on the page, no card around them. Boxing
+ * each one made three small panels competing with the cards below; stripped
+ * back to hairline dividers the numbers themselves become the structure.
+ */
+.statband {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  margin-top: 18px;
+}
+.statband__cell {
+  padding: 14px 4px 13px;
+  text-align: center;
+}
+.statband__cell + .statband__cell {
+  border-left: 1px solid var(--line);
+}
+.statband__v {
+  font: var(--t-stat);
+  letter-spacing: -0.035em;
+}
+.statband__k {
+  font: var(--t-micro);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-top: 5px;
 }
 
 /* --- match row (two teams + score) ---------------------------------------- */
@@ -216,30 +287,57 @@
 
 /* --- pulse feed ("what's happening") -------------------------------------- */
 
+/*
+ * The pulse is a feed, not six separate announcements. As individual cards it
+ * took over the bottom third of Home and each line shouted as loudly as the
+ * live matches above it; grouped into one panel with dividers it reads as a
+ * single glanceable list.
+ */
+.pulse-list {
+  padding: 0 14px;
+}
+
 .pulse {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 14px;
-  background: var(--surface-2);
-  border: 1px solid var(--line);
-  border-radius: var(--r);
+  padding: 13px 0;
   width: 100%;
   text-align: left;
-  transition: transform var(--fast) var(--ease);
+  transition: opacity var(--fast) var(--ease);
+}
+.pulse + .pulse {
+  border-top: 1px solid var(--line);
 }
 .pulse:active {
-  transform: scale(0.985);
+  opacity: 0.6;
 }
-.pulse__icon {
-  font-size: 17px;
+/* The one-word category that replaced the leading emoji. Fixed width so the
+   sentences beside it all start on the same vertical line. */
+.pulse__tag {
   flex: none;
+  width: 62px;
+  font: var(--t-micro);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-4);
+}
+.pulse__tag--live {
+  color: var(--live);
+}
+.pulse__tag--neon {
+  color: var(--neon);
+}
+.pulse__tag--gold {
+  color: var(--gold);
 }
 .pulse__text {
-  font: 600 14px/1.3 var(--font);
+  font: var(--t-body);
+  color: var(--text-2);
 }
+/* Bold alone carries the emphasis — six lime numbers on one screen did not. */
 .pulse__text b {
-  color: var(--neon);
+  color: var(--text);
   font-weight: 800;
 }
 
@@ -394,16 +492,6 @@
   letter-spacing: 0.1em;
 }
 
-.shuttle-icon {
-  animation: serve-bob 2.4s ease-in-out infinite;
-  display: inline-block;
-}
-@keyframes serve-bob {
-  50% {
-    transform: translateY(-2px) rotate(12deg);
-  }
-}
-
 /* mini court diagram showing which service box the server is in */
 .mini-court {
   display: grid;
@@ -552,6 +640,11 @@
   overflow-y: auto;
 }
 
+/* Set by TimelineList only when the rows overflow the box — see the note there. */
+.timeline--more {
+  mask-image: linear-gradient(180deg, #000 calc(100% - 26px), transparent 100%);
+}
+
 .tl-row {
   display: flex;
   align-items: center;
@@ -615,7 +708,10 @@
 }
 
 .celebrate__trophy {
-  font-size: 60px;
+  font: 700 clamp(52px, 17vw, 76px) / 0.9 var(--font-display);
+  letter-spacing: 0.1em;
+  color: var(--neon);
+  text-shadow: 0 0 40px var(--neon-glow);
   animation: trophy-in 700ms var(--spring) both;
 }
 @keyframes trophy-in {
@@ -684,20 +780,48 @@
   background: rgba(200, 255, 46, 0.07);
   border-color: rgba(200, 255, 46, 0.28);
 }
+/*
+ * A hairline between rows. Two dozen of these stacked with only whitespace
+ * between them read as one block of text, and your eye loses which rating
+ * belongs to which name halfway down. The highlighted "you" row keeps its own
+ * rounded pill, so it — and its neighbour — skip the rule.
+ */
 .lb-row + .lb-row {
-  margin-top: 2px;
+  border-top-color: var(--line);
+  border-radius: 0;
+}
+.lb-row--me {
+  border-radius: var(--r);
+  margin: 2px 0;
+}
+.lb-row--me + .lb-row {
+  border-top-color: transparent;
 }
 
 .lb-row__rank {
   width: 30px;
   flex: none;
   text-align: center;
-  font: 800 16px/1 var(--font);
+  font: 800 16px/1 var(--font-body);
   font-variant-numeric: tabular-nums;
   color: var(--text-3);
 }
 .lb-row__rank--medal {
-  font-size: 19px;
+  font-size: 20px;
+}
+
+/*
+ * The top three. These were 🥇🥈🥉; the rank number in the same three metals
+ * says it just as clearly and stays legible at 16px on every device.
+ */
+.rank--gold {
+  color: var(--gold);
+}
+.rank--silver {
+  color: var(--silver);
+}
+.rank--bronze {
+  color: var(--bronze);
 }
 
 .lb-row__name {
@@ -749,12 +873,17 @@
   padding-top: 20px;
 }
 .podium__medal {
-  font-size: 20px;
+  font: 800 15px/1 var(--font-body);
+  font-variant-numeric: tabular-nums;
   position: absolute;
-  top: -12px;
+  top: -11px;
   left: 50%;
   transform: translateX(-50%);
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.6));
+  min-width: 24px;
+  padding: 4px 0;
+  border-radius: var(--r-pill);
+  background: var(--surface-3);
+  border: 1px solid var(--line);
 }
 .podium__name {
   font: 700 13px/1.2 var(--font);
@@ -844,6 +973,11 @@
   position: relative;
 }
 
+/* The avatar is a grid box, so text-align can't centre it — it needs margins. */
+.profile-hero > .avatar {
+  margin-inline: auto;
+}
+
 .profile-hero__name {
   font: 800 26px/1.1 var(--font);
   letter-spacing: -0.025em;
@@ -893,7 +1027,9 @@
 }
 
 .badge {
-  aspect-ratio: 1;
+  /* Squarer than tall now that the glyph is gone — a 1:1 tile left the name
+     floating in the middle of a lot of nothing. */
+  aspect-ratio: 5 / 4;
   border-radius: var(--r);
   background: var(--surface-2);
   border: 1px solid var(--line);
@@ -907,24 +1043,16 @@
   position: relative;
   overflow: hidden;
 }
-.badge__glyph {
-  font-size: 21px;
-  filter: grayscale(1);
-  opacity: 0.3;
-}
+/* No glyph any more, so the name is the badge — it gets the room the icon had. */
 .badge__name {
-  font: 700 9px/1.15 var(--font);
-  letter-spacing: 0.02em;
+  font: 600 12px/1.15 var(--font-display);
+  letter-spacing: 0.06em;
   color: var(--text-4);
   text-transform: uppercase;
 }
 .badge--on {
   border-color: rgba(200, 255, 46, 0.28);
   background: linear-gradient(160deg, rgba(200, 255, 46, 0.1), transparent 60%), var(--surface-2);
-}
-.badge--on .badge__glyph {
-  filter: none;
-  opacity: 1;
 }
 .badge--on .badge__name {
   color: var(--text-2);
@@ -981,6 +1109,10 @@
   flex-direction: column;
   padding: calc(env(safe-area-inset-top) + 28px) max(24px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom) + 24px) max(24px, env(safe-area-inset-left, 0px));
   max-width: var(--shell);
+  /* `.shell` is a column flex container, so the auto margins that centre this
+     also cancel the default stretch. Without an explicit width the screen
+     shrink-wraps its text and the full-bleed photo stops short of the edges. */
+  width: 100%;
   margin: 0 auto;
   position: relative;
   z-index: 1;
@@ -990,13 +1122,57 @@
   flex: 1;
   display: grid;
   place-items: center;
-  font-size: 84px;
-  animation: float 5s ease-in-out infinite;
+}
+
+/*
+ * Full-bleed photograph, bleeding past the screen's own generous padding to the
+ * edges of the shell. It takes the top half; the copy sits under it.
+ */
+.onb__photo {
+  flex: 1;
+  min-height: 200px;
+  margin: calc(env(safe-area-inset-top) * -1 - 28px) -24px 0;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  position: relative;
+}
+.onb__photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, transparent 30%, var(--bg) 97%);
+}
+.onb__photo--band {
+  background-image: url('../assets/photos/shuttle-band.jpg');
+}
+.onb__photo--mesh {
+  background-image: url('../assets/photos/mesh.jpg');
+}
+.onb__photo--feather {
+  background-image: url('../assets/photos/feather.jpg');
+}
+
+.onb__copy {
+  /* Pulled up into the tail of the photo's fade. It needs to sit above the
+     scrim, or the step counter lands underneath it and vanishes. */
+  position: relative;
+  z-index: 1;
+  margin-top: -14px;
+}
+
+/* "01 / 04" — tells you how much of this there is left to sit through. */
+.onb__step {
+  display: block;
+  font: var(--t-micro);
+  letter-spacing: 0.18em;
+  color: var(--neon);
+  margin-bottom: 10px;
 }
 
 .onb__title {
-  font: 800 30px/1.08 var(--font);
-  letter-spacing: -0.03em;
+  font: 700 clamp(36px, 11vw, 46px) / 0.94 var(--font-display);
+  letter-spacing: 0.01em;
 }
 
 .onb__body {
@@ -1082,23 +1258,30 @@
   margin-top: 4px;
 }
 
-.emoji-grid {
+/*
+ * Avatar colour picker. Each swatch shows the initials you'd actually get, so
+ * you're choosing the finished thing rather than an abstract colour chip.
+ */
+.tint-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
 }
-.emoji-grid button {
+.tint-swatch {
   aspect-ratio: 1;
-  border-radius: 12px;
-  background: var(--surface-2);
-  border: 1px solid var(--line);
-  font-size: 20px;
+  border-radius: 50%;
+  background: var(--tint);
+  border: 2px solid transparent;
   display: grid;
   place-items: center;
+  font: 800 15px/1 var(--font-body);
+  color: rgba(12, 20, 0, 0.82);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25);
+  transition: transform var(--fast) var(--spring);
 }
-.emoji-grid button[aria-pressed='true'] {
-  border-color: var(--neon);
-  background: rgba(200, 255, 46, 0.1);
+.tint-swatch[aria-pressed='true'] {
+  border-color: var(--text);
+  transform: scale(1.06);
 }
 
 /* ==========================================================================
@@ -1359,6 +1542,49 @@
   flex: none;
 }
 
+/* --- spectate scoreboard --------------------------------------------------- */
+
+/*
+ * The one screen where the names are the whole point, and the one screen where
+ * they were being cut to "Rahul & …". Two 56px avatars and a 88px score leave
+ * about 110px for the name on a phone. So: smaller faces, and a name that runs
+ * onto a second line rather than truncating. The score keeps its size.
+ */
+.steam {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 0;
+  transition: opacity var(--med) linear;
+}
+.steam--behind {
+  opacity: 0.62;
+}
+/* Small discs, so a lighter overlap — at 32px the standard -10px eats most of
+   the first pair of initials. */
+.steam .avatar-stack .avatar + .avatar {
+  margin-left: -6px;
+}
+.steam__who {
+  flex: 1;
+  min-width: 0;
+}
+.steam__name {
+  font: 600 clamp(21px, 6.4vw, 27px) / 1.02 var(--font-display);
+  letter-spacing: 0.006em;
+  /* Long enough for "Rahul & Karthik" over two lines; a third would push the
+     row taller than the score and unbalance the pair. */
+  overflow-wrap: anywhere;
+}
+.steam__score {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 0.9;
+  font-size: clamp(58px, 20vw, 96px);
+}
+
 /* --- reactions ------------------------------------------------------------ */
 
 .reactions {
@@ -1374,7 +1600,9 @@
   border-radius: var(--r-pill);
   background: var(--surface-2);
   border: 1px solid var(--line);
-  font: 700 12px/1 var(--font);
+  font: 600 12px/1 var(--font-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   font-variant-numeric: tabular-nums;
   color: var(--text-2);
   transition: transform var(--fast) var(--spring);
@@ -1453,4 +1681,42 @@
   font: 800 12px/1 var(--font);
   letter-spacing: 0.14em;
   color: var(--text-4);
+}
+
+/* --- credits -------------------------------------------------------------- */
+
+/*
+ * One attribution per row, hairline-separated. The name leads because that's
+ * what the licence actually requires; what the photo is used for is context.
+ */
+.credit {
+  display: block;
+  padding: 13px 0;
+}
+.credit + .credit {
+  border-top: 1px solid var(--line);
+}
+.credit__who {
+  display: block;
+  font: var(--t-h3);
+  letter-spacing: 0.008em;
+}
+.credit__what {
+  display: block;
+  font: var(--t-small);
+  color: var(--text-3);
+  margin-top: 3px;
+}
+.credit__src {
+  display: inline-block;
+  margin-top: 7px;
+  font: var(--t-small);
+}
+
+/* The "1 v 1" / "2 v 2" mark on the match-type cards. */
+.type-card__art {
+  font: 800 21px/1 var(--font-body);
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+  flex: none;
 }

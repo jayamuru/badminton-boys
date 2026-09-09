@@ -9,6 +9,7 @@
  */
 import type { AppNotification, Challenge, Club, Match, Player, Tournament } from '../types'
 import { DEFAULT_FORMAT, computeState, isGameOver } from '../engine/scoring'
+import { AVATAR_TINTS } from '../lib/tints'
 import type { Format, Rally, Side } from '../types'
 
 /** mulberry32 — small, fast, deterministic. */
@@ -41,23 +42,11 @@ function shuffled<T>(items: readonly T[], rand: () => number): T[] {
   return out
 }
 
-const TINTS = [
-  '#C8FF2E',
-  '#5AC8FA',
-  '#FF6B9D',
-  '#FFC83D',
-  '#8B7CFF',
-  '#2BE08A',
-  '#FF8A3D',
-  '#4DD8C0',
-  '#FF5A5F',
-  '#9BE15D',
-]
+const TINTS = AVATAR_TINTS
 
 interface Sketch {
   name: string
   handle: string
-  emoji: string
   skill: number
   level: Player['level']
   city: string
@@ -66,30 +55,30 @@ interface Sketch {
 }
 
 const SKETCHES: Sketch[] = [
-  { name: 'Jayanth T', handle: 'jayanth', emoji: '🦅', skill: 0.6, level: 'Intermediate', city: 'Bengaluru', club: 0, bio: 'Backhand still a work in progress. Cross-court drop is not.' },
-  { name: 'Rahul Menon', handle: 'rahulm', emoji: '🐅', skill: 0.82, level: 'Competitive', city: 'Bengaluru', club: 0, bio: 'Left-handed. Plays every single evening.' },
-  { name: 'Karthik R', handle: 'karthik', emoji: '🐺', skill: 0.78, level: 'Competitive', city: 'Bengaluru', club: 0 },
-  { name: 'Arjun Nair', handle: 'arjun', emoji: '⚡', skill: 0.75, level: 'Advanced', city: 'Bengaluru', club: 0, bio: 'Doubles specialist. Front court is home.' },
-  { name: 'Vijay Kumar', handle: 'vijay', emoji: '🦊', skill: 0.64, level: 'Advanced', city: 'Bengaluru', club: 0 },
-  { name: 'Arun Prasad', handle: 'arunp', emoji: '🐋', skill: 0.62, level: 'Intermediate', city: 'Bengaluru', club: 0, bio: "Jayanth's regular doubles partner." },
-  { name: 'Suresh Babu', handle: 'suresh', emoji: '🦁', skill: 0.55, level: 'Intermediate', city: 'Bengaluru', club: 0 },
-  { name: 'Anil Joseph', handle: 'anil', emoji: '🐻', skill: 0.58, level: 'Intermediate', city: 'Bengaluru', club: 1 },
-  { name: 'Raj Shetty', handle: 'rajs', emoji: '🦈', skill: 0.6, level: 'Advanced', city: 'Bengaluru', club: 1 },
-  { name: 'Vivek Iyer', handle: 'vivek', emoji: '🐬', skill: 0.53, level: 'Intermediate', city: 'Bengaluru', club: 1 },
-  { name: 'Manoj Pillai', handle: 'manoj', emoji: '🦉', skill: 0.5, level: 'Intermediate', city: 'Bengaluru', club: 1 },
-  { name: 'Deepak Rao', handle: 'deepak', emoji: '🐘', skill: 0.68, level: 'Advanced', city: 'Bengaluru', club: 0 },
-  { name: 'Meera Krishnan', handle: 'meerak', emoji: '🦋', skill: 0.79, level: 'Competitive', city: 'Bengaluru', club: 0, bio: 'State level. Mixed doubles > everything.' },
-  { name: 'Divya S', handle: 'divya', emoji: '🌸', skill: 0.71, level: 'Advanced', city: 'Bengaluru', club: 0 },
-  { name: 'Priya Ramesh', handle: 'priyar', emoji: '🔥', skill: 0.66, level: 'Advanced', city: 'Bengaluru', club: 1 },
-  { name: 'Ananya Gowda', handle: 'ananya', emoji: '🌊', skill: 0.57, level: 'Intermediate', city: 'Bengaluru', club: 1 },
-  { name: 'Nikhil Verma', handle: 'nikhil', emoji: '🚀', skill: 0.45, level: 'Beginner', city: 'Bengaluru', club: 0, bio: 'Started in March. Improving fast.' },
-  { name: 'Praveen Kumar', handle: 'praveen', emoji: '🎯', skill: 0.49, level: 'Beginner', city: 'Bengaluru', club: 2 },
-  { name: 'Harish M', handle: 'harish', emoji: '🐆', skill: 0.63, level: 'Advanced', city: 'Bengaluru', club: 2 },
-  { name: 'Kiran Bhat', handle: 'kiran', emoji: '🦌', skill: 0.52, level: 'Intermediate', city: 'Bengaluru', club: 2 },
-  { name: 'Aditya Sharma', handle: 'aditya', emoji: '🌟', skill: 0.7, level: 'Advanced', city: 'Bengaluru', club: 2 },
-  { name: 'Rohit Desai', handle: 'rohit', emoji: '🐂', skill: 0.47, level: 'Beginner', city: 'Bengaluru', club: 2 },
-  { name: 'Sanjay Hegde', handle: 'sanjay', emoji: '🦅', skill: 0.56, level: 'Intermediate', city: 'Bengaluru', club: 1 },
-  { name: 'Naveen Reddy', handle: 'naveen', emoji: '⚔️', skill: 0.61, level: 'Advanced', city: 'Bengaluru', club: 0 },
+  { name: 'Jayanth T', handle: 'jayanth', skill: 0.6, level: 'Intermediate', city: 'Bengaluru', club: 0, bio: 'Backhand still a work in progress. Cross-court drop is not.' },
+  { name: 'Rahul Menon', handle: 'rahulm', skill: 0.82, level: 'Competitive', city: 'Bengaluru', club: 0, bio: 'Left-handed. Plays every single evening.' },
+  { name: 'Karthik R', handle: 'karthik', skill: 0.78, level: 'Competitive', city: 'Bengaluru', club: 0 },
+  { name: 'Arjun Nair', handle: 'arjun', skill: 0.75, level: 'Advanced', city: 'Bengaluru', club: 0, bio: 'Doubles specialist. Front court is home.' },
+  { name: 'Vijay Kumar', handle: 'vijay', skill: 0.64, level: 'Advanced', city: 'Bengaluru', club: 0 },
+  { name: 'Arun Prasad', handle: 'arunp', skill: 0.62, level: 'Intermediate', city: 'Bengaluru', club: 0, bio: "Jayanth's regular doubles partner." },
+  { name: 'Suresh Babu', handle: 'suresh', skill: 0.55, level: 'Intermediate', city: 'Bengaluru', club: 0 },
+  { name: 'Anil Joseph', handle: 'anil', skill: 0.58, level: 'Intermediate', city: 'Bengaluru', club: 1 },
+  { name: 'Raj Shetty', handle: 'rajs', skill: 0.6, level: 'Advanced', city: 'Bengaluru', club: 1 },
+  { name: 'Vivek Iyer', handle: 'vivek', skill: 0.53, level: 'Intermediate', city: 'Bengaluru', club: 1 },
+  { name: 'Manoj Pillai', handle: 'manoj', skill: 0.5, level: 'Intermediate', city: 'Bengaluru', club: 1 },
+  { name: 'Deepak Rao', handle: 'deepak', skill: 0.68, level: 'Advanced', city: 'Bengaluru', club: 0 },
+  { name: 'Meera Krishnan', handle: 'meerak', skill: 0.79, level: 'Competitive', city: 'Bengaluru', club: 0, bio: 'State level. Mixed doubles > everything.' },
+  { name: 'Divya S', handle: 'divya', skill: 0.71, level: 'Advanced', city: 'Bengaluru', club: 0 },
+  { name: 'Priya Ramesh', handle: 'priyar', skill: 0.66, level: 'Advanced', city: 'Bengaluru', club: 1 },
+  { name: 'Ananya Gowda', handle: 'ananya', skill: 0.57, level: 'Intermediate', city: 'Bengaluru', club: 1 },
+  { name: 'Nikhil Verma', handle: 'nikhil', skill: 0.45, level: 'Beginner', city: 'Bengaluru', club: 0, bio: 'Started in March. Improving fast.' },
+  { name: 'Praveen Kumar', handle: 'praveen', skill: 0.49, level: 'Beginner', city: 'Bengaluru', club: 2 },
+  { name: 'Harish M', handle: 'harish', skill: 0.63, level: 'Advanced', city: 'Bengaluru', club: 2 },
+  { name: 'Kiran Bhat', handle: 'kiran', skill: 0.52, level: 'Intermediate', city: 'Bengaluru', club: 2 },
+  { name: 'Aditya Sharma', handle: 'aditya', skill: 0.7, level: 'Advanced', city: 'Bengaluru', club: 2 },
+  { name: 'Rohit Desai', handle: 'rohit', skill: 0.47, level: 'Beginner', city: 'Bengaluru', club: 2 },
+  { name: 'Sanjay Hegde', handle: 'sanjay', skill: 0.56, level: 'Intermediate', city: 'Bengaluru', club: 1 },
+  { name: 'Naveen Reddy', handle: 'naveen', skill: 0.61, level: 'Advanced', city: 'Bengaluru', club: 0 },
 ]
 
 export const ME = 'p0'
@@ -158,7 +147,6 @@ export function buildSeed(now = Date.now()): SeedData {
     id: `p${i}`,
     name: s.name,
     handle: s.handle,
-    emoji: s.emoji,
     tint: TINTS[i % TINTS.length],
     level: s.level,
     rating: Math.round(880 + s.skill * 320),
@@ -435,11 +423,11 @@ export function buildSeed(now = Date.now()): SeedData {
   ]
 
   const notifications: AppNotification[] = [
-    { id: 'n0', icon: '🔔', text: 'Your match starts in 32 minutes — Court 3', at: now - 60_000, read: false, link: `/match/${upcoming[0].id}` },
-    { id: 'n1', icon: '👤', text: 'Arjun Nair challenged you to a best of 3', at: now - 40 * 60_000, read: false, link: '/play' },
-    { id: 'n2', icon: '🔴', text: "Rahul Menon's match is LIVE on Court 1", at: now - 55 * 60_000, read: false, link: '/live' },
-    { id: 'n3', icon: '🏆', text: 'You moved up to #12 in Bengaluru', at: now - 5 * HOUR, read: true, link: '/leaderboard' },
-    { id: 'n4', icon: '🔥', text: 'Badminton Boys Cup semi-finals start tonight', at: now - 9 * HOUR, read: true, link: '/tournament/t0' },
+    { id: 'n0', text: 'Your match starts in 32 minutes — Court 3', at: now - 60_000, read: false, link: `/match/${upcoming[0].id}` },
+    { id: 'n1', text: 'Arjun Nair challenged you to a best of 3', at: now - 40 * 60_000, read: false, link: '/play' },
+    { id: 'n2', text: "Rahul Menon's match is LIVE on Court 1", at: now - 55 * 60_000, read: false, link: '/live' },
+    { id: 'n3', text: 'You moved up to #12 in Bengaluru', at: now - 5 * HOUR, read: true, link: '/leaderboard' },
+    { id: 'n4', text: 'Badminton Boys Cup semi-finals start tonight', at: now - 9 * HOUR, read: true, link: '/tournament/t0' },
   ]
 
   players.sort((a, b) => Number(a.id.slice(1)) - Number(b.id.slice(1)))

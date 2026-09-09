@@ -29,8 +29,7 @@ export function HeadToHead() {
       <div className="page">
         <BackBar title="Head to head" />
         <Empty
-          glyph="⚖️"
-          title="Pick someone to compare"
+            title="Pick someone to compare"
           body="See the full historical record between you and any other player."
           cta="Choose a player"
           onCta={() => setPicking(true)}
@@ -109,7 +108,7 @@ export function HeadToHead() {
             className="btn btn--primary mt-16"
             onClick={() => nav(`/create?mode=challenge&opponent=${pb.id}`)}
           >
-            ⚔️ Set up the first one
+            Set up the first one
           </button>
         </div>
       ) : (
@@ -180,7 +179,7 @@ export function PlayerPicker({
   return (
     <Sheet open={open} onClose={onClose} title="Compare with">
       <div className="search mb-12">
-        <span className="search__icon">🔍</span>
+        
         <input
           className="input"
           placeholder="Search players"
@@ -204,7 +203,7 @@ export function PlayerPicker({
                 {p.name}
               </span>
               <span className="mrow__meta">
-                ⭐ {p.rating} · {stats[p.id]?.wins ?? 0}W {stats[p.id]?.losses ?? 0}L
+                {p.rating} · {stats[p.id]?.wins ?? 0}W {stats[p.id]?.losses ?? 0}L
               </span>
             </span>
             <span className="action__chev">›</span>

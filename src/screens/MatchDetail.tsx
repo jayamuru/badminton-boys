@@ -5,6 +5,7 @@ import { computeState, gamesList } from '../engine/scoring'
 import type { Match, Side } from '../types'
 import { clock, dayLabel, relative, signed, teamName } from '../lib/format'
 import { Avatar, BackBar, LivePill, Sheet, useToast } from '../components/ui'
+import { REACTION_LABEL } from '../lib/reactions'
 import { ShareSheet } from '../components/ShareSheet'
 import { TimelineList } from './Scoring'
 
@@ -51,8 +52,8 @@ export function MatchDetail() {
       <BackBar
         title={live ? undefined : match.round ?? match.type}
         right={
-          <button className="icon-btn" onClick={() => setShowShare(true)} aria-label="Share">
-            ⇪
+          <button className="text-btn" onClick={() => setShowShare(true)}>
+            Share
           </button>
         }
       />
@@ -60,7 +61,7 @@ export function MatchDetail() {
       <div className="row gap-8 mb-12 wrap">
         {live && <LivePill />}
         {pending && <span className="pill pill--gold">Awaiting confirmation</span>}
-        {match.status === 'disputed' && <span className="pill pill--loss">⚠ Disputed</span>}
+        {match.status === 'disputed' && <span className="pill pill--loss">Disputed</span>}
         {done && <span className="pill pill--neon">Final</span>}
         {upcoming && <span className="pill">{dayLabel(match.scheduledAt)} · {clock(match.scheduledAt)}</span>}
         <span className="pill">{match.court}</span>
@@ -78,7 +79,7 @@ export function MatchDetail() {
                 className="reaction"
                 onClick={() => dispatch({ type: 'react', matchId: match.id, kind: k })}
               >
-                {k === 'fire' ? '🔥' : k === 'clap' ? '👏' : '😮'} {match.reactions[k]}
+                {REACTION_LABEL[k]} {match.reactions[k]}
               </button>
             ))}
           </div>
@@ -88,7 +89,7 @@ export function MatchDetail() {
       {/* --- primary action depends entirely on lifecycle stage --- */}
       {upcoming && canScore && (
         <button className="btn btn--primary btn--lg btn--block mt-16" onClick={() => nav(`/score/${match.id}`)}>
-          🏸 Start match
+          Start match
         </button>
       )}
 
@@ -105,7 +106,7 @@ export function MatchDetail() {
 
       {live && !canScore && (
         <button className="btn btn--live btn--lg btn--block mt-16" onClick={() => nav(`/watch/${match.id}`)}>
-          🔴 Watch live scoreboard
+          Watch live scoreboard
         </button>
       )}
 
@@ -155,7 +156,7 @@ export function MatchDetail() {
 
       {match.status === 'disputed' && (
         <div className="card mt-16" style={{ borderColor: 'rgba(255,90,95,0.3)' }}>
-          <p className="micro loss">⚠ Result disputed</p>
+          <p className="micro loss">Result disputed</p>
           {match.disputes?.map((d, i) => (
             <p key={i} className="small mt-8">
               <b>{playerById(d.playerId).name}</b> says: “{d.claim}”
@@ -304,7 +305,7 @@ export function Scorecard({ match }: { match: Match }) {
             <Avatar key={pid} player={playerById(pid)} size="xs" />
           ))}
           <span className="truncate">{teamName(ids, playerById)}</span>
-          {isWinner && <span>🏆</span>}
+          {isWinner && <span className="micro neon">WON</span>}
         </div>
         {games.map((g, i) => {
           const v = side === 'A' ? g.a : g.b

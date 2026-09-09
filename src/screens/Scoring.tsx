@@ -113,7 +113,7 @@ export function Scoring() {
         {serving ? (
           <div className="row gap-8">
             <span className="serve-badge">
-              <span className="shuttle-icon">🏸</span>
+              
               {match.type === 'Doubles' ? firstName(playerById(serverId)) : 'Serving'}
             </span>
             <MiniCourt court={s.serve.court} />
@@ -126,7 +126,7 @@ export function Scoring() {
   }
 
   const banner = s.matchPoint
-    ? { text: `🔥 Match point — ${teamName(idsOf(s.matchPoint), playerById)}`, game: false }
+    ? { text: `Match point — ${teamName(idsOf(s.matchPoint), playerById)}`, game: false }
     : s.gamePoint
       ? { text: `Game point — ${teamName(idsOf(s.gamePoint), playerById)}`, game: true }
       : null
@@ -155,8 +155,8 @@ export function Scoring() {
             )
           })}
         </div>
-        <button className="icon-btn" onClick={() => setShowShare(true)} aria-label="Share live match">
-          ⇪
+        <button className="text-btn" onClick={() => setShowShare(true)} aria-label="Share live match">
+          Share
         </button>
       </div>
 
@@ -190,7 +190,7 @@ export function Scoring() {
             ⇄ Swap ends
           </button>
           <button className="mini-btn" onClick={() => setShowTimeline(true)}>
-            ☰ {match.rallies.length}
+            {match.rallies.length} rallies
           </button>
         </div>
 
@@ -256,9 +256,23 @@ export function TimelineList({ match, limit }: { match: Match; limit?: number })
   const { playerById } = useApp()
   const rows = timeline(match)
   const shown = limit ? rows.slice(0, limit) : rows
+
+  /*
+   * The list scrolls past six or so rallies, and a row sliced through the middle
+   * of its text reads as a rendering fault. `.timeline--more` fades the bottom
+   * edge to say "there's more below" — but only when there actually is, or a
+   * three-point match would have its last row dimmed for no reason.
+   */
+  const listRef = useRef<HTMLDivElement>(null)
+  const [scrolls, setScrolls] = useState(false)
+  useEffect(() => {
+    const el = listRef.current
+    if (el) setScrolls(el.scrollHeight > el.clientHeight + 1)
+  }, [shown.length])
+
   if (!shown.length) return <p className="small dim center mt-16">No points yet.</p>
   return (
-    <div className="timeline">
+    <div className={`timeline${scrolls ? ' timeline--more' : ''}`} ref={listRef}>
       {shown.map((r, i) => (
         <div className="tl-row" key={i}>
           <span className="tl-row__score">

@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import type { Player } from '../types'
 import type { PlayerStats } from '../engine/stats'
+import { initials } from '../lib/format'
 import { Avatar, Sheet, useToast } from './ui'
 
 /** True inside the packaged Android app, where anchor downloads are a no-op. */
@@ -57,13 +58,17 @@ export function ExportSheet({
     g.fillStyle = glow
     g.fillRect(0, 0, W, H)
 
+    // Inter rather than the app's display face: this canvas is rasterised the
+    // moment the sheet opens, and a webfont that hasn't finished loading falls
+    // back silently to whatever the platform has — on a shared image you'd
+    // never see that it went wrong.
     const font = (w: number, s: number) =>
-      `${w} ${s}px "Inter Tight", -apple-system, "Segoe UI", Roboto, sans-serif`
+      `${w} ${s}px "Inter", -apple-system, "Segoe UI", Roboto, sans-serif`
 
     g.fillStyle = '#C8FF2E'
     g.font = font(800, 30)
     g.letterSpacing = '6px'
-    g.fillText('🏸 BADMINTON BOYS', 72, 116)
+    g.fillText('BADMINTON BOYS', 72, 116)
 
     g.fillStyle = '#FFFFFF'
     g.font = font(800, 84)
@@ -91,9 +96,17 @@ export function ExportSheet({
       g.textAlign = 'center'
       g.fillText(String(i + 1), 96, y + 12)
 
+      // The player's initials on their tint, matching the avatars in the app.
+      g.beginPath()
+      g.arc(166, y - 2, 26, 0, Math.PI * 2)
+      g.fillStyle = r.player.tint
+      g.fill()
+      g.fillStyle = '#0C1400'
+      g.font = font(800, 24)
+      g.textAlign = 'center'
+      g.fillText(initials(r.player.name), 166, y + 7)
+
       g.textAlign = 'left'
-      g.font = font(400, 42)
-      g.fillText(r.player.emoji, 148, y + 14)
 
       g.fillStyle = '#FFFFFF'
       g.font = font(700, 40)
@@ -167,7 +180,7 @@ export function ExportSheet({
       <div className="share-card" ref={cardRef}>
         <div className="court-lines" />
         <p className="micro" style={{ color: 'var(--neon)', letterSpacing: '0.24em' }}>
-          🏸 BADMINTON BOYS
+          BADMINTON BOYS
         </p>
         <h2 className="h1 mt-8">Weekly Top 10</h2>
         <p className="small dim">

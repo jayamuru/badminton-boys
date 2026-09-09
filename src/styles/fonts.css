@@ -1,0 +1,50 @@
+/* ==========================================================================
+   BADMINTON BOYS — type
+   Two families, self-hosted. Khand is a condensed Indian-Type-Foundry display
+   face: tall, narrow, and built to shout in a small space, which is exactly
+   what a score at arm's length needs. Inter carries everything you actually
+   read at rest.
+
+   Both are bundled rather than pulled from a CDN. This ships as an APK, and a
+   webfont that arrives over the network — or doesn't — reflows the scoreboard
+   mid-rally.
+   ========================================================================== */
+
+/* Khand — display. Four static weights; it has no variable cut. */
+@font-face {
+  font-family: 'Khand';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/fonts/khand-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Khand';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../assets/fonts/khand-500.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Khand';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../assets/fonts/khand-600.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Khand';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../assets/fonts/khand-700.woff2') format('woff2');
+}
+
+/* Inter — body. One variable file covers 400–800, so weight is free. */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('../assets/fonts/inter-latin-var.woff2') format('woff2');
+}

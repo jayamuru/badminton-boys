@@ -5,6 +5,7 @@ import { computeState } from '../engine/scoring'
 import type { Side } from '../types'
 import { firstName, teamName } from '../lib/format'
 import { Avatar, LivePill } from '../components/ui'
+import { REACTION_LABEL } from '../lib/reactions'
 import { TimelineList } from './Scoring'
 
 /**
@@ -41,25 +42,16 @@ export function Spectate() {
     const opp = side === 'A' ? s.current.b : s.current.a
     const serving = s.serve.side === side && live
     return (
-      <div
-        className="row"
-        style={{
-          gap: 12,
-          padding: '18px 0',
-          opacity: score < opp ? 0.62 : 1,
-          transition: 'opacity 200ms',
-        }}
-      >
+      <div className={`steam${score < opp ? ' steam--behind' : ''}`}>
         <div className="avatar-stack">
           {ids.map((pid) => (
-            <Avatar key={pid} player={playerById(pid)} size="lg" />
+            <Avatar key={pid} player={playerById(pid)} size="sm" />
           ))}
         </div>
-        <div className="grow" style={{ minWidth: 0 }}>
-          <div className="h2 truncate">{teamName(ids, playerById)}</div>
+        <div className="steam__who">
+          <div className="steam__name">{teamName(ids, playerById)}</div>
           {serving && (
             <span className="serve-badge mt-8">
-              <span className="shuttle-icon">🏸</span>
               {match.type === 'Doubles'
                 ? `${firstName(playerById(ids[s.serve.serverIndex] ?? ids[0]))} serving`
                 : 'Serving'}
@@ -69,7 +61,7 @@ export function Spectate() {
           )}
         </div>
         <div
-          className={`score score--xl${score > opp ? ' neon' : ''}`}
+          className={`steam__score${score > opp ? ' neon' : ''}`}
           key={`${side}-${score}`}
           style={{ animation: 'score-pop 380ms var(--spring)' }}
         >
@@ -86,7 +78,7 @@ export function Spectate() {
           ‹
         </button>
         <span className="wordmark grow">
-          <span className="wordmark__shuttle">🏸</span>
+          
           <span className="wordmark__bb">
             BADMINTON <span>BOYS</span>
           </span>
@@ -97,7 +89,7 @@ export function Spectate() {
       <div className="row gap-8 mt-16 wrap">
         <span className="pill">{match.court}</span>
         <span className="pill">Game {s.gameIndex + 1}</span>
-        {tournament && <span className="pill pill--gold">🏆 {tournament.name}</span>}
+        {tournament && <span className="pill pill--gold">{tournament.name}</span>}
         {match.round && <span className="pill">{match.round}</span>}
       </div>
 
@@ -110,13 +102,13 @@ export function Spectate() {
 
       {s.matchPoint && (
         <div className="matchpoint mt-16" style={{ borderRadius: 'var(--r)' }}>
-          🔥 Match point — {teamName(s.matchPoint === 'A' ? match.teamA : match.teamB, playerById)}
+          Match point — {teamName(s.matchPoint === 'A' ? match.teamA : match.teamB, playerById)}
         </div>
       )}
 
       {s.finished && (
         <div className="card card--neon mt-16 center">
-          <div style={{ fontSize: 34 }}>🏆</div>
+          
           <p className="h2 mt-8">
             {teamName(s.winner === 'A' ? match.teamA : match.teamB, playerById)} win
           </p>
@@ -154,7 +146,7 @@ export function Spectate() {
               className="reaction"
               onClick={() => dispatch({ type: 'react', matchId: match.id, kind: k })}
             >
-              {k === 'fire' ? '🔥' : k === 'clap' ? '👏' : '😮'} {match.reactions[k]}
+              {REACTION_LABEL[k]} {match.reactions[k]}
             </button>
           ))}
         </div>

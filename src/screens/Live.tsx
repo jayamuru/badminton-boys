@@ -45,7 +45,7 @@ export function Live() {
   }, [live, filter, me.clubId, state.follows])
 
   return (
-    <>
+    <div className="page">
       <header className="topbar topbar--flush">
         <div className="grow">
           <div className="row gap-8">
@@ -71,7 +71,6 @@ export function Live() {
 
       {shown.length === 0 && (
         <Empty
-          glyph="🏸"
           title="Nothing live here yet"
           body={
             filter === 'all'
@@ -82,6 +81,6 @@ export function Live() {
           onCta={() => (filter === 'all' ? nav('/play') : setFilter('all'))}
         />
       )}
-    </>
+    </div>
   )
 }

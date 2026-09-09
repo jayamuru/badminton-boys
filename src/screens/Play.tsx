@@ -50,42 +50,41 @@ export function Play() {
   }
 
   return (
-    <>
+    <div className="page">
       <header className="topbar topbar--flush">
         <h1 className="h1 grow">Play</h1>
       </header>
 
       <div className="stack">
         <ActionRow
-          icon="⚡"
           title="Quick match"
           sub="Skip the setup — start scoring right now"
           onClick={() => setQuick(true)}
           tint="var(--neon)"
         />
         <ActionRow
-          icon="🏸"
           title="Create match"
           sub="Pick players, format, court and time"
           onClick={() => nav('/create')}
+          tint="#5AC8FA"
         />
         <ActionRow
-          icon="⚔️"
           title="Challenge a player"
           sub="Call someone out for a best of 3"
           onClick={() => nav('/create?mode=challenge')}
+          tint="#FF6B9D"
         />
         <ActionRow
-          icon="👥"
           title="Find players"
           sub="Discover players near you by level and rating"
           onClick={() => nav('/players')}
+          tint="#8B7CFF"
         />
         <ActionRow
-          icon="🏆"
           title="Tournaments"
           sub="Brackets, group stages and live dashboards"
           onClick={() => nav(`/tournament/${state.tournaments[0]?.id ?? ''}`)}
+          tint="var(--gold)"
         />
       </div>
 
@@ -96,7 +95,7 @@ export function Play() {
             {incoming.map((c) => (
               <div key={c.id} className="card card--neon">
                 <div className="row gap-8 mb-12">
-                  <span className="pill pill--neon">⚔️ Challenge</span>
+                  <span className="pill pill--neon">Challenge</span>
                   <span className="court-tag">
                     {dayLabel(c.at)} · {clock(c.at)}
                   </span>
@@ -133,7 +132,7 @@ export function Play() {
                         invitesAccepted: [me.id, c.fromId],
                       }
                       dispatch({ type: 'createMatch', match })
-                      toast('Match confirmed 🏸')
+                      toast('Match confirmed')
                     }}
                   >
                     Accept
@@ -186,10 +185,10 @@ export function Play() {
 
       <Sheet open={quick} onClose={() => setQuick(false)} title="Quick match" subtitle="Straight to the scoreboard. Casual — it won't affect your rating.">
         <div className="stack">
-          <ActionRow icon="👤" title="Singles" sub="1 v 1" onClick={() => startQuick('Singles')} />
-          <ActionRow icon="👥" title="Doubles" sub="2 v 2" onClick={() => startQuick('Doubles')} />
+          <ActionRow title="Singles" sub="1 v 1" onClick={() => startQuick('Singles')} />
+          <ActionRow title="Doubles" sub="2 v 2" onClick={() => startQuick('Doubles')} />
         </div>
       </Sheet>
-    </>
+    </div>
   )
 }

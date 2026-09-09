@@ -33,7 +33,8 @@ create table if not exists profiles (
   user_id    uuid unique references auth.users(id) on delete set null,
   name       text not null,
   handle     text not null unique,
-  emoji      text not null default '🏸',
+  -- The avatar is the player's initials drawn on this colour. There used to be
+  -- an `emoji` column beside it; the app no longer reads one.
   tint       text not null default '#C8FF2E',
   level      text not null default 'Intermediate'
              check (level in ('Beginner','Intermediate','Advanced','Competitive')),
@@ -120,7 +121,8 @@ create table if not exists follows (
 create table if not exists notifications (
   id         uuid primary key default gen_random_uuid(),
   profile_id uuid not null references profiles(id) on delete cascade,
-  icon       text not null default '🏸',
+  -- No `icon` column: the category shown against a notification is derived from
+  -- its `link` at render time, so there's nothing to store.
   text       text not null,
   link       text,
   read       boolean not null default false,
@@ -585,3 +587,12 @@ update profiles set club_id = 'b0000000-0000-4000-8000-000000000001' where club_
 insert into club_members (club_id, profile_id)
   select club_id, id from profiles where club_id is not null
   on conflict do nothing;
+
+-- ---------------------------------------------------------------------------
+-- Migrations for databases created before the emoji removal
+-- ---------------------------------------------------------------------------
+-- Both columns were `not null default '🏸'`, so an older database still accepts
+-- inserts from the current app — these just stop it carrying dead data.
+
+alter table profiles      drop column if exists emoji;
+alter table notifications drop column if exists icon;

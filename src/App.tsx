@@ -23,6 +23,7 @@ import { Spectate } from './screens/Spectate'
 import { HeadToHead } from './screens/HeadToHead'
 import { Onboarding, Register } from './screens/Onboarding'
 import { CloudError, CloudSplash, SignIn } from './screens/SignIn'
+import { Credits } from './screens/Credits'
 import {
   ClubDetail,
   FindClubs,
@@ -97,6 +98,7 @@ function Shell() {
           <Route path="/club/:id" element={<ClubDetail />} />
           <Route path="/tournament/:id" element={<TournamentScreen />} />
           <Route path="/notifications" element={<Notifications />} />
+          <Route path="/credits" element={<Credits />} />
 
           <Route path="/welcome" element={<Onboarding />} />
           <Route path="/register" element={<Register />} />

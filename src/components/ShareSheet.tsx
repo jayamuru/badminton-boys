@@ -70,8 +70,8 @@ export function ShareSheet({
   const share = async () => {
     const title = `${teamName(match.teamA, playerById)} vs ${teamName(match.teamB, playerById)}`
     const text = live
-      ? `🔴 LIVE — ${title}  ${s.current.a}–${s.current.b}\nWatch the live scoreboard:`
-      : `🏸 ${title}\n${games.map((g) => `${g.a}–${g.b}`).join(', ')}\nFull scorecard:`
+      ? `LIVE — ${title}  ${s.current.a}–${s.current.b}\nWatch the live scoreboard:`
+      : `${title}\n${games.map((g) => `${g.a}–${g.b}`).join(', ')}\nFull scorecard:`
     try {
       if (navigator.share) {
         await navigator.share({ title: 'Badminton Boys', text, url })
@@ -132,7 +132,7 @@ export function ShareSheet({
         )}
 
         <div className="share-card__brand">
-          <span>🏸 BADMINTON BOYS</span>
+          <span>BADMINTON BOYS</span>
           <span>PLAY · SCORE · COMPETE · CLIMB</span>
         </div>
       </div>

@@ -52,7 +52,6 @@ it('adds a player to your own roster', () => {
     id: uid('p'),
     name: 'Rahul Menon',
     handle: 'rahulmenon',
-    emoji: '🦊',
     tint: '#C8FF2E',
     level: 'Advanced',
     rating: 1120,

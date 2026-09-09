@@ -102,7 +102,14 @@ p {
 .page {
   flex: 1;
   padding: 0 var(--gut-r) calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 28px) var(--gut-l);
-  animation: page-in var(--med) var(--ease-out) both;
+  /*
+   * `backwards`, not `both`. With `both` the browser keeps a transform on the
+   * element for good — an identity matrix, but enough to make `.page` a
+   * stacking context, which trapped every overlay rendered inside it beneath
+   * the tab bar. `backwards` still holds the start state before the first
+   * frame, which is all this needs.
+   */
+  animation: page-in var(--med) var(--ease-out) backwards;
 }
 
 .page--flush {
@@ -123,17 +130,22 @@ p {
 
 /* --- typography helpers --------------------------------------------------- */
 
+/*
+ * Khand is drawn condensed, so the negative tracking these headings used to
+ * carry (tuned for Inter) now closes the counters up into a smear. They want a
+ * touch of air instead.
+ */
 .h1 {
   font: var(--t-h1);
-  letter-spacing: -0.02em;
+  letter-spacing: 0.004em;
 }
 .h2 {
   font: var(--t-h2);
-  letter-spacing: -0.015em;
+  letter-spacing: 0.006em;
 }
 .h3 {
   font: var(--t-h3);
-  letter-spacing: -0.01em;
+  letter-spacing: 0.008em;
 }
 .small {
   font: var(--t-small);

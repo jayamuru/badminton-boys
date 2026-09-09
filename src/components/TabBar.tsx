@@ -1,12 +1,18 @@
 import { NavLink, useLocation } from 'react-router-dom'
 import { useApp } from '../store/AppStore'
 
+/**
+ * Words, not pictograms. Five destinations is few enough that the label alone
+ * is unambiguous, and a set-in-Khand word bar reads faster than a row of emoji
+ * that render differently on every handset. Play keeps its "+" because it's an
+ * action rather than a place.
+ */
 const TABS = [
-  { to: '/', icon: '🏠', label: 'Home', end: true },
-  { to: '/live', icon: '📡', label: 'Live', end: false },
-  { to: '/play', icon: '+', label: 'Play', end: false, play: true },
-  { to: '/leaderboard', icon: '📊', label: 'Ranks', end: false },
-  { to: '/profile', icon: '👤', label: 'Profile', end: false },
+  { to: '/', label: 'Home', end: true },
+  { to: '/live', label: 'Live', end: false },
+  { to: '/play', label: 'Play', end: false, play: true },
+  { to: '/leaderboard', label: 'Ranks', end: false },
+  { to: '/profile', label: 'You', end: false },
 ]
 
 /** Hide the bar on immersive screens (scoring, spectate, onboarding). */
@@ -32,7 +38,7 @@ export function TabBar() {
             `tab${isActive ? ' tab--active' : ''}${t.play ? ' tab--play' : ''}`
           }
         >
-          <span className="tab__icon">{t.icon}</span>
+          {t.play && <span className="tab__plus">+</span>}
           <span className="tab__label">{t.label}</span>
           {t.to === '/live' && liveCount > 0 && <span className="tab__badge" />}
         </NavLink>

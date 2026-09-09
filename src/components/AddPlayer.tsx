@@ -2,10 +2,9 @@ import { useState } from 'react'
 import { useApp } from '../store/AppStore'
 import type { Level, Player } from '../types'
 import { uid } from '../lib/format'
-import { Sheet, useToast } from './ui'
+import { AVATAR_TINTS } from '../lib/tints'
+import { Sheet, TintPicker, useToast } from './ui'
 
-const EMOJIS = ['🦅', '🐅', '🐺', '⚡', '🦊', '🐋', '🦁', '🐻', '🦈', '🐬', '🦉', '🐘', '🦋', '🌸', '🔥', '🌊', '🚀', '🎯']
-const TINTS = ['#C8FF2E', '#5AC8FA', '#FF6B9D', '#FFC83D', '#8B7CFF', '#2BE08A']
 const LEVELS: Level[] = ['Beginner', 'Intermediate', 'Advanced', 'Competitive']
 
 /** Starting ratings, so a new roster isn't dead flat on day one. */
@@ -32,12 +31,12 @@ export function AddPlayerSheet({
   const { state, me, dispatch } = useApp()
   const toast = useToast()
   const [name, setName] = useState('')
-  const [emoji, setEmoji] = useState(EMOJIS[0])
+  const [tint, setTint] = useState<string>(AVATAR_TINTS[0])
   const [level, setLevel] = useState<Level>('Intermediate')
 
   const reset = () => {
     setName('')
-    setEmoji(EMOJIS[Math.floor(Math.random() * EMOJIS.length)])
+    setTint(AVATAR_TINTS[Math.floor(Math.random() * AVATAR_TINTS.length)])
     setLevel('Intermediate')
   }
 
@@ -54,8 +53,7 @@ export function AddPlayerSheet({
       id: uid('p'),
       name: trimmed,
       handle,
-      emoji,
-      tint: TINTS[EMOJIS.indexOf(emoji) % TINTS.length],
+      tint,
       level,
       rating: SEED_RATING[level],
       city: me?.city ?? '',
@@ -91,14 +89,8 @@ export function AddPlayerSheet({
         </label>
 
         <div className="field">
-          <span className="field__label">Avatar</span>
-          <div className="emoji-grid">
-            {EMOJIS.map((e) => (
-              <button key={e} aria-pressed={emoji === e} onClick={() => setEmoji(e)}>
-                {e}
-              </button>
-            ))}
-          </div>
+          <span className="field__label">Avatar colour</span>
+          <TintPicker value={tint} onChange={setTint} name={name} />
         </div>
 
         <div className="field">

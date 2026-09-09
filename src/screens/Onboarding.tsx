@@ -3,35 +3,41 @@ import { useNavigate } from 'react-router-dom'
 import { useApp } from '../store/AppStore'
 import type { GameType, Level, Player } from '../types'
 import { uid } from '../lib/format'
-import { useToast } from '../components/ui'
+import { AVATAR_TINTS } from '../lib/tints'
+import { TintPicker, useToast } from '../components/ui'
 import { Logo } from '../components/Logo'
 import { createProfile } from '../backend/api'
 
+/**
+ * `photo` names a class in screens.css rather than an imported URL, so the
+ * three shuttlecock shots are declared once in CSS and shared with the empty
+ * states and the sign-in screen instead of being bundled per slide.
+ */
 const SLIDES = [
   {
-    art: '🏸',
+    photo: null,
     title: 'Welcome to\nBadminton Boys',
     body: 'Play. Score. Compete. Climb.',
     brand: true,
   },
   {
-    art: '📋',
-    title: 'Track your matches',
+    photo: 'band',
+    title: 'Track your\nmatches',
     body: 'Every match, game and point kept in one place — with a scorecard you can pull up months later.',
   },
   {
-    art: '📈',
-    title: 'Climb the leaderboard',
+    photo: 'mesh',
+    title: 'Climb the\nleaderboard',
     body: 'A real rating that moves with every competitive match. See where you sit in your club, your city and beyond.',
   },
   {
-    art: '📡',
-    title: 'Watch live matches',
+    photo: 'feather',
+    title: 'Watch live\nmatches',
     body: "Follow any match point by point, even the ones you're not playing in. Share a link and friends can watch too.",
   },
   {
-    art: '🏆',
-    title: 'Find your community',
+    photo: 'band',
+    title: 'Find your\ncommunity',
     body: 'Join clubs, challenge players and compete in tournaments with proper brackets.',
   },
 ]
@@ -59,11 +65,16 @@ export function Onboarding() {
         </div>
       ) : (
         <>
-          <div className="onb__art">{slide.art}</div>
-          <h1 className="onb__title" style={{ whiteSpace: 'pre-line' }}>
-            {slide.title}
-          </h1>
-          <p className="onb__body">{slide.body}</p>
+          <div className={`onb__photo onb__photo--${slide.photo}`} role="presentation" />
+          <div className="onb__copy">
+            <span className="onb__step num">
+              {String(i).padStart(2, '0')} / {String(SLIDES.length - 1).padStart(2, '0')}
+            </span>
+            <h1 className="onb__title" style={{ whiteSpace: 'pre-line' }}>
+              {slide.title}
+            </h1>
+            <p className="onb__body">{slide.body}</p>
+          </div>
         </>
       )}
 
@@ -97,9 +108,6 @@ const LEVELS: { value: Level; sub: string }[] = [
   { value: 'Competitive', sub: 'Tournaments and league play' },
 ]
 
-const EMOJIS = ['🦅', '🐅', '🐺', '⚡', '🦊', '🐋', '🦁', '🐻', '🦈', '🐬', '🦉', '🐘', '🦋', '🌸', '🔥', '🌊', '🚀', '🎯']
-const TINTS = ['#C8FF2E', '#5AC8FA', '#FF6B9D', '#FFC83D', '#8B7CFF', '#2BE08A']
-
 export function Register() {
   const { state, me, dispatch, cloud } = useApp()
   const nav = useNavigate()
@@ -107,7 +115,7 @@ export function Register() {
   const [saving, setSaving] = useState(false)
   const [err, setErr] = useState<string | null>(null)
   const [name, setName] = useState(me?.name ?? '')
-  const [emoji, setEmoji] = useState(me?.emoji ?? '🦅')
+  const [tint, setTint] = useState<string>(me?.tint ?? AVATAR_TINTS[0])
   const [level, setLevel] = useState<Level>(me?.level ?? 'Intermediate')
   const [prefers, setPrefers] = useState<GameType>(me?.prefers ?? 'Both')
   const [clubId, setClubId] = useState(me?.clubId ?? state.clubs[0]?.id ?? '')
@@ -123,8 +131,7 @@ export function Register() {
       id: existing?.id ?? uid('p'),
       name: trimmed,
       handle,
-      emoji,
-      tint: TINTS[EMOJIS.indexOf(emoji) % TINTS.length],
+      tint,
       level,
       rating: existing?.rating ?? 1000,
       city: 'Bengaluru',
@@ -143,7 +150,7 @@ export function Register() {
       try {
         await createProfile({ ...player, id: uid('p') })
         await cloud.refresh()
-        toast('Welcome to Badminton Boys 🏸')
+        toast('Welcome to Badminton Boys')
         nav('/')
       } catch (e) {
         setErr(e instanceof Error ? e.message : 'Could not create your profile')
@@ -160,7 +167,7 @@ export function Register() {
       nav('/players')
       return
     }
-    toast('Welcome to Badminton Boys 🏸')
+    toast('Welcome to Badminton Boys')
     nav('/')
   }
 
@@ -212,14 +219,8 @@ export function Register() {
         </label>
 
         <div className="field">
-          <span className="field__label">Pick an avatar</span>
-          <div className="emoji-grid">
-            {EMOJIS.map((e) => (
-              <button key={e} aria-pressed={emoji === e} onClick={() => setEmoji(e)}>
-                {e}
-              </button>
-            ))}
-          </div>
+          <span className="field__label">Avatar colour</span>
+          <TintPicker value={tint} onChange={setTint} name={name} />
         </div>
 
         <div className="field">
@@ -314,7 +315,7 @@ export function Register() {
         disabled={!name.trim() || saving}
         onClick={() => void save()}
       >
-        {saving ? 'Creating your profile…' : 'Start playing 🏸'}
+        {saving ? 'Creating your profile…' : 'Start playing'}
       </button>
       <p className="micro center mt-12">You start at a 1,000 rating. Ten matches sets your true level.</p>
     </div>
