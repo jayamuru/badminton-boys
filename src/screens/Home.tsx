@@ -96,12 +96,24 @@ export function Home() {
       </header>
 
       {/*
-        A full-bleed photograph behind the greeting. It's the one place on the
-        home screen with room for an image, and it gives the app a subject —
-        without it the whole screen is text on black.
+        A full-bleed photograph behind the greeting. Your own if you've put one
+        on your profile, the shuttlecock if you haven't — it's the one place on
+        the home screen with room for an image, and without it the whole screen
+        is text on black.
+
+        A face wants to be near the top of a 172px band rather than centred in
+        it, hence the different focal point for the two cases.
       */}
       <div className="home-hero">
-        <span className="home-hero__photo" role="presentation" />
+        <span
+          className="home-hero__photo"
+          role="presentation"
+          style={
+            me.photo
+              ? { ['--hero' as string]: `url(${JSON.stringify(me.photo)})`, ['--hero-pos' as string]: '50% 28%' }
+              : undefined
+          }
+        />
         <div className="home-hero__copy">
           <div className="greeting__hello">{greeting()}</div>
           <h1 className="greeting__name">{firstName(me)}</h1>

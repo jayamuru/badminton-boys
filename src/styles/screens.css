@@ -19,11 +19,17 @@
   isolation: isolate;
 }
 
+/*
+ * The default is the shuttlecock. When the reader has put a photo on their
+ * profile, Home.tsx overrides `--hero` with it and shifts the focal point to
+ * the top of the frame, where a face is.
+ */
 .home-hero__photo {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: url('../assets/photos/shuttle-band.jpg') 62% 44% / cover no-repeat;
+  background: var(--hero, url('../assets/photos/shuttle-band.jpg')) var(--hero-pos, 62% 44%) / cover
+    no-repeat;
 }
 
 /*
@@ -50,10 +56,16 @@
   text-transform: uppercase;
   color: var(--text-3);
 }
+/*
+ * The reader's own name, in the same neon as BOYS in the wordmark and set in
+ * the one face reserved for names. Outfit is much wider than Khand, so the
+ * lower bound of the clamp drops to keep a long name on one line.
+ */
 .greeting__name {
-  font: 700 clamp(38px, 12vw, 52px) / 0.92 var(--font-display);
-  letter-spacing: 0.01em;
-  margin-top: 2px;
+  font: 800 clamp(30px, 9.5vw, 42px) / 1 var(--font-name);
+  letter-spacing: -0.015em;
+  color: var(--neon);
+  margin-top: 3px;
 }
 
 /*
@@ -978,9 +990,43 @@
   margin-inline: auto;
 }
 
+/*
+ * Your own avatar, as the control that changes it. The hint sits across the
+ * bottom of the disc rather than beside it: on the disc it's unmistakably about
+ * the picture, and it costs no vertical space in a hero that's already tall.
+ */
+.photo-btn {
+  position: relative;
+  display: block;
+  margin-inline: auto;
+  border-radius: 50%;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.photo-btn__hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  padding: 5px 0 6px;
+  border-radius: 0 0 999px 999px;
+  background: rgba(0, 0, 0, 0.62);
+  color: #fff;
+  font: var(--t-micro);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.photo-btn:active {
+  transform: scale(0.97);
+}
+
 .profile-hero__name {
-  font: 800 26px/1.1 var(--font);
-  letter-spacing: -0.025em;
+  font: 800 26px/1.1 var(--font-name);
+  letter-spacing: -0.02em;
   margin-top: 12px;
 }
 
@@ -1122,6 +1168,22 @@
   flex: 1;
   display: grid;
   place-items: center;
+}
+
+/*
+ * Sign-in: one block, centred. `.signin__mid` takes all the free height and
+ * centres its contents inside it, which leaves the one closing line of small
+ * print sitting at the foot of the screen where footnotes belong.
+ */
+.signin__mid {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* A keyboard opening shortens the viewport; without this the logo is the
+     thing that gets clipped rather than the thing that gets out of the way. */
+  min-height: 0;
+  padding-bottom: 24px;
 }
 
 /*

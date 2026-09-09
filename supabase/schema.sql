@@ -36,6 +36,12 @@ create table if not exists profiles (
   -- The avatar is the player's initials drawn on this colour. There used to be
   -- an `emoji` column beside it; the app no longer reads one.
   tint       text not null default '#C8FF2E',
+  -- An optional profile picture, held inline as a `data:` URL rather than in a
+  -- storage bucket, so that a club can have profile photos without anyone
+  -- having to provision object storage and write policies for it. The app
+  -- shrinks every upload to a 720px JPEG (~40-70 KB) before it gets here; the
+  -- ceiling below is a backstop against a client that doesn't.
+  photo      text check (photo is null or length(photo) <= 400000),
   level      text not null default 'Intermediate'
              check (level in ('Beginner','Intermediate','Advanced','Competitive')),
   rating     int  not null default 1000,
@@ -596,3 +602,18 @@ insert into club_members (club_id, profile_id)
 
 alter table profiles      drop column if exists emoji;
 alter table notifications drop column if exists icon;
+
+-- ---------------------------------------------------------------------------
+-- Migration: profile photos
+-- ---------------------------------------------------------------------------
+-- Safe to run on a live database. Until it does, uploading a photo fails with
+-- "column photo does not exist" — everything else keeps working.
+
+alter table profiles add column if not exists photo text;
+do $$
+begin
+  alter table profiles add constraint profiles_photo_len
+    check (photo is null or length(photo) <= 400000);
+exception
+  when duplicate_object then null;
+end $$;

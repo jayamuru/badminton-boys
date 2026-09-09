@@ -249,6 +249,17 @@
   cursor: pointer;
 }
 
+/*
+ * A link that shouldn't shout: an undo, a licence notice. It needs its own rule
+ * rather than `.small.dim`, because `.link` sets both `font` and `color`
+ * itself and wins the cascade against anything in base.css.
+ */
+.link--quiet {
+  font: var(--t-small);
+  color: var(--text-3);
+  text-underline-offset: 3px;
+}
+
 .btn--lg {
   height: 54px;
   font-size: 16px;
@@ -378,6 +389,22 @@
   font: 800 calc(var(--size) * 0.38) / 1 var(--font-body);
   letter-spacing: 0.01em;
   color: rgba(12, 20, 0, 0.82);
+}
+
+/*
+ * A photo fills the disc and sits above the gloss `::after` — that highlight is
+ * drawn to stop a flat colour reading as a swatch, and over a face it does
+ * nothing but haze it. The hairline stays, so a pale photo still has an edge.
+ */
+.avatar__photo {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25);
 }
 
 .avatar--xs {

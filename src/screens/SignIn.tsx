@@ -43,7 +43,12 @@ function suggestAddress(input: string): string | null {
 
 /**
  * Cloud mode only. A badminton group shouldn't need a password ceremony, so
- * this is a one-time email code plus a one-tap guest option.
+ * this is a one-time code sent to an email address and nothing else.
+ *
+ * There was a guest option beside it, signing in anonymously. It's gone: a
+ * guest is a fresh throwaway player every time, so anyone who used it turned up
+ * on the leaderboard as a stranger with no history and no way back into the
+ * account they'd just been given.
  *
  * The code matters more than it looks. Inside the Android app the page is
  * served from `https://localhost`, and a magic link tapped in Gmail opens the
@@ -137,25 +142,6 @@ export function SignIn() {
     }
   }
 
-  const guest = async () => {
-    setBusy(true)
-    setErr(null)
-    try {
-      const { error } = await db().auth.signInAnonymously()
-      if (error) throw error
-    } catch (e) {
-      setErr(
-        e instanceof Error && /anonymous/i.test(e.message)
-          ? 'Guest sign-in is switched off for this app. Use your email instead.'
-          : e instanceof Error
-            ? e.message
-            : 'Could not sign in',
-      )
-    } finally {
-      setBusy(false)
-    }
-  }
-
   if (sent) {
     return (
       <div className="onb">
@@ -216,65 +202,59 @@ export function SignIn() {
   }
 
   return (
-    <div className="onb">
-      <div className="onb__art">
+    <div className="onb signin">
+      {/*
+        Logo and form as one centred block. There is exactly one thing to do on
+        this screen, so it belongs in the middle of it — the form used to sit at
+        the bottom with a hundred-odd pixels of nothing above it, which read as
+        a page that hadn't finished loading.
+      */}
+      <div className="signin__mid">
         <div className="brand-lockup">
-          <Logo size={140} />
+          <Logo size={132} />
           <div className="brand-lockup__tag">PLAY · SCORE · COMPETE · CLIMB</div>
         </div>
-      </div>
 
-      <div className="stack-lg">
-        <label className="field">
-          <span className="field__label">Sign in with your email</span>
-          <input
-            className="input"
-            type="email"
-            inputMode="email"
-            autoComplete="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && void sendCode()}
-          />
-        </label>
+        <div className="stack-lg mt-32">
+          <label className="field">
+            <span className="field__label">Sign in with your email</span>
+            <input
+              className="input"
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && void sendCode()}
+            />
+          </label>
 
-        {suggestion && (
-          <p className="small">
-            Did you mean{' '}
-            <button className="link" onClick={() => setEmail(suggestion)}>
-              {suggestion}
-            </button>
-            ? Nothing will arrive if the address is wrong.
-          </p>
-        )}
+          {suggestion && (
+            <p className="small">
+              Did you mean{' '}
+              <button className="link" onClick={() => setEmail(suggestion)}>
+                {suggestion}
+              </button>
+              ? Nothing will arrive if the address is wrong.
+            </p>
+          )}
 
-        {err && <p className="small" style={{ color: 'var(--loss)' }}>{err}</p>}
+          {err && <p className="small" style={{ color: 'var(--loss)' }}>{err}</p>}
 
-        <button
-          className="btn btn--primary btn--lg btn--block"
-          disabled={busy}
-          onClick={() => void sendCode()}
-        >
-          {busy ? 'Sending…' : 'Email me a sign-in code'}
-        </button>
-
-        <div className="or-line">
-          <span>or</span>
+          <button
+            className="btn btn--primary btn--lg btn--block"
+            disabled={busy}
+            onClick={() => void sendCode()}
+          >
+            {busy ? 'Sending…' : 'Email me a sign-in code'}
+          </button>
         </div>
-
-        <button className="btn btn--block" disabled={busy} onClick={guest}>
-          Have a look around as a guest
-        </button>
-        {/* Sentence case, not `.micro` — that's an all-caps label style, and a
-            two-line sentence set in it is a chore to read. */}
-        <p className="small dim center mt-8">
-          A guest is a fresh throwaway account every time. Use your email if you want the
-          same player card and rating to be here next time.
-        </p>
       </div>
 
-      <p className="small dim center mt-16">
+      {/* Sentence case, not `.micro` — that's an all-caps label style, and a
+          sentence set in it is a chore to read. */}
+      <p className="small dim center">
         Everyone who signs in here shares the same players, matches and leaderboards.
       </p>
     </div>

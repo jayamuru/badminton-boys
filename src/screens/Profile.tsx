@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useApp } from '../store/AppStore'
+import { PhotoError, readImageAsDataUrl } from '../lib/photo'
 import { leaderboard, partnerships, sideOf, statsFor } from '../engine/stats'
 import { achievementsFor } from '../engine/achievements'
 import { nextTier, tierFor } from '../engine/rating'
@@ -39,6 +40,27 @@ function PlayerView({ player, isMe }: { player: Player; isMe: boolean }) {
   const toast = useToast()
   const [tab, setTab] = useState<Tab>('overview')
   const [showSettings, setShowSettings] = useState(false)
+  const fileRef = useRef<HTMLInputElement>(null)
+
+  const pickPhoto = async (file: File) => {
+    try {
+      const photo = await readImageAsDataUrl(file)
+      dispatch({ type: 'updatePlayer', player: { id: me.id, photo } })
+      toast('Photo updated')
+    } catch (e) {
+      // Every one of these is something the reader can act on — the wrong file,
+      // a picture the browser can't decode — so say which, rather than failing
+      // silently and leaving the old photo in place with no explanation.
+      toast(e instanceof PhotoError ? e.message : "That photo couldn't be used.")
+    }
+  }
+
+  const removePhoto = () => {
+    // Empty string, not undefined: `updatePlayer` merges, so a missing key
+    // would leave the old photo exactly where it was.
+    dispatch({ type: 'updatePlayer', player: { id: me.id, photo: '' } })
+    toast('Photo removed')
+  }
 
   const stats = useMemo(() => statsFor(player.id, state.matches), [player.id, state.matches])
   const cityRank = useMemo(() => {
@@ -104,7 +126,43 @@ function PlayerView({ player, isMe }: { player: Player; isMe: boolean }) {
       )}
 
       <div className="profile-hero">
-        <Avatar player={player} size="xl" />
+        {isMe ? (
+          <>
+            {/*
+              Tapping your own avatar is the whole affordance. A separate "Edit
+              photo" row would be another thing to find, and the picture is
+              already the obvious thing to press.
+            */}
+            <button
+              className="photo-btn"
+              onClick={() => fileRef.current?.click()}
+              aria-label={player.photo ? 'Change your photo' : 'Add a photo'}
+            >
+              <Avatar player={player} size="xl" />
+              <span className="photo-btn__hint">{player.photo ? 'Change' : 'Add photo'}</span>
+            </button>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                // Clear it straight away, or picking the same file twice in a
+                // row fires no change event and looks like the app ignored you.
+                e.target.value = ''
+                if (file) void pickPhoto(file)
+              }}
+            />
+            {player.photo && (
+              <button className="link link--quiet mt-8" onClick={removePhoto}>
+                Remove photo
+              </button>
+            )}
+          </>
+        ) : (
+          <Avatar player={player} size="xl" />
+        )}
         <h1 className="profile-hero__name">{player.name}</h1>
         <p className="small dim mt-4">@{player.handle}</p>
         <div className="profile-hero__meta">
@@ -380,15 +438,6 @@ function PlayerView({ player, isMe }: { player: Player; isMe: boolean }) {
           <button className="btn btn--block" onClick={() => nav('/welcome')}>
             Replay onboarding
           </button>
-          <button
-            className="btn btn--block"
-            onClick={() => {
-              setShowSettings(false)
-              nav('/credits')
-            }}
-          >
-            Credits
-          </button>
 
           {cloud.enabled ? (
             <button
@@ -441,6 +490,20 @@ function PlayerView({ player, isMe }: { player: Player; isMe: boolean }) {
           )}
         </div>
       </Sheet>
+
+      {/*
+        The photographs are Creative Commons Attribution, which is only
+        satisfied if the credit ships with them — so this link has to exist
+        somewhere a reader can reach. At the foot of your own profile it's out
+        of the way of the settings a person actually opens the sheet for.
+      */}
+      {isMe && (
+        <p className="center mt-24">
+          <button className="link link--quiet" onClick={() => nav('/credits')}>
+            Photography and type credits
+          </button>
+        </p>
+      )}
     </div>
   )
 }

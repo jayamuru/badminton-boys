@@ -92,6 +92,8 @@
     Helvetica, Arial, sans-serif;
   /* Default family for anything that hasn't opted into display type. */
   --font: var(--font-body);
+  /* People's names only — see the note in fonts.css. */
+  --font-name: 'Outfit', var(--font-body);
 
   --t-display: 700 clamp(56px, 17vw, 88px) / 0.84 var(--font-display);
   --t-h1: 700 34px/1.02 var(--font-display);

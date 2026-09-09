@@ -16,10 +16,12 @@ import { AVATAR_TINTS } from '../lib/tints'
 /* --- avatar --------------------------------------------------------------- */
 
 /**
- * Initials on the player's tint. This used to be an emoji animal, which meant
- * every avatar was drawn by the device's emoji font — different on every phone,
- * unreadable at 24px, and telling you nothing about who the person was.
- * Initials scale down cleanly and actually identify someone.
+ * The player's photo if they've added one, their initials on their tint if not.
+ *
+ * The initials aren't a placeholder to be embarrassed about — most people never
+ * upload anything, this is the state the app is usually in, and it identifies
+ * someone at 26px better than a cropped face does. The photo is the option, not
+ * the goal.
  */
 export function Avatar({
   player,
@@ -37,7 +39,11 @@ export function Avatar({
       style={{ ['--tint' as string]: player.tint }}
       aria-label={player.name}
     >
-      <span className="avatar__glyph">{initials(player.name)}</span>
+      {player.photo ? (
+        <img className="avatar__photo" src={player.photo} alt="" />
+      ) : (
+        <span className="avatar__glyph">{initials(player.name)}</span>
+      )}
     </div>
   )
 }

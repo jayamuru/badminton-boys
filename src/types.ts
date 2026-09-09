@@ -15,8 +15,18 @@ export interface Player {
   id: string
   name: string
   handle: string
-  /** Avatar colour. The avatar itself is the player's initials — see `initials()`. */
+  /** Avatar colour, and the fallback avatar: the player's initials on it. */
   tint: string
+  /**
+   * A photo of the player, as a `data:` URL, or undefined for the initials.
+   *
+   * Stored inline rather than in a bucket because there isn't one to store it
+   * in — the app talks to Postgres and nothing else, and asking someone to
+   * provision object storage and its policies before their club can have
+   * profile pictures is a worse trade than a few dozen KB in a text column.
+   * `readImageAsDataUrl` shrinks whatever came off the camera to fit.
+   */
+  photo?: string
   level: Level
   rating: number
   city: string

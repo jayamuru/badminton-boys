@@ -18,6 +18,7 @@ export interface ProfileRow {
   name: string
   handle: string
   tint: string
+  photo: string | null
   level: Player['level']
   rating: number
   city: string
@@ -111,6 +112,7 @@ export const toPlayer = (r: ProfileRow): Player => ({
   name: r.name,
   handle: r.handle,
   tint: r.tint,
+  photo: r.photo ?? undefined,
   level: r.level,
   rating: r.rating,
   city: r.city,
@@ -197,6 +199,8 @@ export const fromPlayer = (p: Player, userId?: string | null, createdBy?: string
   name: p.name,
   handle: p.handle,
   tint: p.tint,
+  // Empty string means "removed", and the column is nullable, not empty-able.
+  photo: p.photo || null,
   level: p.level,
   city: p.city,
   club_id: p.clubId ?? null,

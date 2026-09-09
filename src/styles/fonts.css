@@ -40,6 +40,24 @@
   src: url('../assets/fonts/khand-700.woff2') format('woff2');
 }
 
+/*
+ * Outfit — the reader's own name, and nobody else's type.
+ *
+ * A person's name is the one word on the home screen that belongs to whoever is
+ * holding the phone, so it gets a face of its own. Outfit is geometric and wide
+ * where Khand is condensed, which is the whole point: set beside each other the
+ * contrast reads as deliberate rather than as two fonts that failed to agree.
+ * Its circular bowls also echo the pill buttons the rest of the app is built
+ * from. One weight — a nameplate has no use for a light cut.
+ */
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('../assets/fonts/outfit-800.woff2') format('woff2');
+}
+
 /* Inter — body. One variable file covers 400–800, so weight is free. */
 @font-face {
   font-family: 'Inter';

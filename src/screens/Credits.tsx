@@ -5,6 +5,10 @@ import { BackBar } from '../components/ui'
  * satisfied if the credit ships with the image, so it has to be reachable from
  * inside the app and not just from `src/assets/ATTRIBUTIONS.md` in the repo.
  * Keep the two in step when an asset is added or dropped.
+ *
+ * Reached from the foot of your own profile. It was a button in the settings
+ * sheet, which put a licence notice in among the things people actually open
+ * settings to do.
  */
 const PHOTOS = [
   {
@@ -27,6 +31,7 @@ const PHOTOS = [
 const FONTS = [
   { family: 'Khand', who: 'Indian Type Foundry, Jyotish Sonowal', use: 'Headings and labels' },
   { family: 'Inter', who: 'Rasmus Andersson', use: 'Body text and every number' },
+  { family: 'Outfit', who: 'Rodrigo Fuenzalida, Smartsheet', use: "Players' names" },
 ]
 
 export function Credits() {
@@ -66,7 +71,7 @@ export function Credits() {
 
       <h2 className="section-head__title mt-24">Type</h2>
       <p className="small dim mt-4">
-        Both families are under the{' '}
+        All three families are under the{' '}
         <a className="link" href="https://openfontlicense.org" target="_blank" rel="noreferrer">
           SIL Open Font License 1.1
         </a>
