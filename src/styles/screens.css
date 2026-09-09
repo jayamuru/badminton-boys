@@ -1184,6 +1184,16 @@
      thing that gets clipped rather than the thing that gets out of the way. */
   min-height: 0;
   padding-bottom: 24px;
+  /* Everything else on this screen sits on the centre line — the logo, the
+     tagline, the button's label — so a flush-left field label read as a stray.
+     One field, one axis. */
+  text-align: center;
+}
+
+/* Form controls don't inherit `text-align`, so the placeholder and whatever
+   gets typed over it need saying explicitly or they stay off to the left. */
+.signin__mid .input {
+  text-align: center;
 }
 
 /*

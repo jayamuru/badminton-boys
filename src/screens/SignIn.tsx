@@ -255,7 +255,7 @@ export function SignIn() {
       {/* Sentence case, not `.micro` — that's an all-caps label style, and a
           sentence set in it is a chore to read. */}
       <p className="small dim center">
-        Everyone who signs in here shares the same players, matches and leaderboards.
+        copyrights reserved
       </p>
     </div>
   )
